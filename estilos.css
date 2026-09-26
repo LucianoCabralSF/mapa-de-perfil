@@ -431,10 +431,10 @@ p.destaque {
     padding: 10px 0 0;
   }
 
-  .grafico { margin: 8px 0; }
+  /* Na folha o SVG esticaria ate a largura toda e as letras cresceriam junto. */
+  .grafico { width: 88mm; max-width: 100%; margin: 6px 0; }
   .medidor { font-size: 28pt; }
 
-  .grafico { max-width: 100%; }
 
   p.destaque {
     background: #fff;
