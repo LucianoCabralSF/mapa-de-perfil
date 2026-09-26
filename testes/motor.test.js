@@ -10,6 +10,8 @@ import {
   MAPA_MOTIVACOES,
   MOTIVADORES,
   NOMES_MOTIVADOR,
+  pontuarMomento,
+  DIRECOES_MOMENTO,
 } from '../src/motor.js';
 
 test('FATORES esta na ordem canonica', () => {
@@ -163,4 +165,33 @@ test('empate geral cai na ordem canonica', () => {
 
 test('NOMES_MOTIVADOR cobre os seis codigos', () => {
   assert.deepEqual(Object.keys(NOMES_MOTIVADOR).sort(), [...MOTIVADORES].sort());
+});
+
+test('as direcoes seguem a especificacao', () => {
+  assert.deepEqual(DIRECOES_MOMENTO, ['direta', 'direta', 'invertida', 'invertida', 'invertida']);
+});
+
+test('vida tranquila da momento estavel', () => {
+  const { pct, faixa } = pontuarMomento([1, 1, 5, 5, 5]);
+  assert.equal(pct, 0);
+  assert.equal(faixa, 'estavel');
+});
+
+test('vida em crise da momento turbulento', () => {
+  const { pct, faixa } = pontuarMomento([5, 5, 1, 1, 1]);
+  assert.equal(pct, 100);
+  assert.equal(faixa, 'turbulento');
+});
+
+test('as perguntas invertidas realmente invertem', () => {
+  const soDiretas = pontuarMomento([5, 5, 5, 5, 5]);
+  const soInvertidas = pontuarMomento([1, 1, 1, 1, 1]);
+  assert.equal(soDiretas.bruto, 8);
+  assert.equal(soInvertidas.bruto, 12);
+});
+
+test('meio da escala cai na faixa do meio', () => {
+  const { pct, faixa } = pontuarMomento([3, 3, 3, 3, 3]);
+  assert.equal(pct, 50);
+  assert.equal(faixa, 'movimento');
 });

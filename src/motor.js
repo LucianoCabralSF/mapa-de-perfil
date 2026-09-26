@@ -104,3 +104,19 @@ export function pontuarMotivacoes(respostas) {
       return MOTIVADORES.indexOf(a.codigo) - MOTIVADORES.indexOf(b.codigo);
     });
 }
+
+export const DIRECOES_MOMENTO = ['direta', 'direta', 'invertida', 'invertida', 'invertida'];
+
+export function pontuarMomento(respostas) {
+  let bruto = 0;
+  DIRECOES_MOMENTO.forEach((direcao, indice) => {
+    const nota = respostas[indice];
+    if (typeof nota !== 'number') return;
+    bruto += direcao === 'direta' ? nota - 1 : 4 - (nota - 1);
+  });
+  const pct = Math.round((bruto / 20) * 100);
+  let faixa = 'estavel';
+  if (pct >= 56) faixa = 'turbulento';
+  else if (pct >= 26) faixa = 'movimento';
+  return { bruto, pct, faixa };
+}
