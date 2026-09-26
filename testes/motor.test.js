@@ -5,6 +5,7 @@ import {
   pontuarComportamento,
   definirPerfil,
   NOMES_FATOR,
+  calcularTensao,
 } from '../src/motor.js';
 
 test('FATORES esta na ordem canonica', () => {
@@ -77,4 +78,44 @@ test('empate no topo usa a ordem canonica para desempatar', () => {
 
 test('NOMES_FATOR cobre os quatro fatores', () => {
   assert.deepEqual(Object.keys(NOMES_FATOR).sort(), ['A', 'C', 'E', 'P']);
+});
+
+test('natural igual a adaptado da tensao zero e nenhum fator apontado', () => {
+  const pct = { E: 70, C: 40, P: 50, A: 40 };
+  const tensao = calcularTensao(pct, pct);
+  assert.equal(tensao.indice, 0);
+  assert.equal(tensao.faixa, 'baixa');
+  assert.equal(tensao.forcado, null);
+  assert.equal(tensao.contido, null);
+});
+
+test('perfis opostos dao tensao alta', () => {
+  const natural = { E: 100, C: 0, P: 100, A: 0 };
+  const adaptado = { E: 0, C: 100, P: 0, A: 100 };
+  const tensao = calcularTensao(natural, adaptado);
+  assert.equal(tensao.indice, 100);
+  assert.equal(tensao.faixa, 'alta');
+});
+
+test('aponta o fator mais forcado e o mais contido', () => {
+  const natural = { E: 30, C: 60, P: 50, A: 60 };
+  const adaptado = { E: 75, C: 35, P: 50, A: 60 };
+  const tensao = calcularTensao(natural, adaptado);
+  assert.equal(tensao.forcado, 'E');
+  assert.equal(tensao.contido, 'C');
+});
+
+test('diferencas menores que 5 nao apontam fator', () => {
+  const natural = { E: 50, C: 50, P: 50, A: 50 };
+  const adaptado = { E: 54, C: 47, P: 50, A: 49 };
+  const tensao = calcularTensao(natural, adaptado);
+  assert.equal(tensao.forcado, null);
+  assert.equal(tensao.contido, null);
+});
+
+test('as tres faixas respeitam os limites da especificacao', () => {
+  const base = { E: 50, C: 50, P: 50, A: 50 };
+  assert.equal(calcularTensao(base, { E: 59, C: 41, P: 50, A: 50 }).faixa, 'baixa');
+  assert.equal(calcularTensao(base, { E: 70, C: 30, P: 50, A: 50 }).faixa, 'moderada');
+  assert.equal(calcularTensao(base, { E: 90, C: 10, P: 50, A: 50 }).faixa, 'alta');
 });
