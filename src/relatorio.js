@@ -34,15 +34,6 @@ function botaoImprimir(posicao) {
     + ` data-posicao="${posicao}">Salvar em PDF</button>`;
 }
 
-function indice(secoes) {
-  const itens = secoes
-    .map(({ id, rotulo }) => `<li><a href="#${id}">${rotulo}<span aria-hidden="true">›</span></a></li>`)
-    .join('');
-  return '<nav id="indice" class="sem-impressao" aria-label="Seções do relatório">'
-    + '<p class="indice-rotulo">IR DIRETO PARA</p>'
-    + `<ul>${itens}</ul></nav>`;
-}
-
 function creditoDel() {
   return '<div class="credito-del">'
     + '<p class="credito-titulo">Ferramenta desenvolvida pela DEL — Desenvolvimento Humano e Gerencial.</p>'
@@ -103,19 +94,6 @@ export function montarRelatorio(resultado) {
   const dominante = perfil.dominante;
   const temAdaptado = Boolean(adaptado && tensao);
 
-  const secoes = [
-    { id: 'perfil', rotulo: 'Seu perfil' },
-    ...(temAdaptado ? [{ id: 'comparacao', rotulo: 'Natural × Adaptado' }] : []),
-    { id: 'momento', rotulo: 'Momento atual' },
-    { id: 'motivadores', rotulo: 'O que te motiva' },
-    { id: 'fortes', rotulo: 'Pontos fortes' },
-    { id: 'atencao', rotulo: 'Pontos de atenção' },
-    { id: 'comunicacao', rotulo: 'Como se comunicar com você' },
-    { id: 'ambiente', rotulo: 'Ambiente' },
-    { id: 'desmotiva', rotulo: 'O que te desmotiva' },
-    { id: 'ressalvas', rotulo: 'Leia com cuidado' },
-  ];
-
   const contexto = resultado.contexto
     ? `<p class="contexto">${escaparHtml(resultado.contexto)}</p>`
     : '';
@@ -129,7 +107,6 @@ export function montarRelatorio(resultado) {
 
   const partes = [
     cabecalho,
-    indice(secoes),
     cartao('perfil', 'Seu perfil', `<p class="titulo-perfil">${escaparHtml(perfil.titulo)}</p>`
       + paragrafo(RETRATOS[dominante])
       + barrasComportamento(natural.pct)),

@@ -121,8 +121,7 @@ p { text-align: left; }
 
 .opcao:focus-visible,
 .escala-item:focus-visible,
-.botao-principal:focus-visible,
-#indice a:focus-visible {
+.botao-principal:focus-visible {
   outline: 2px solid var(--navy);
   outline-offset: 2px;
 }
@@ -286,52 +285,6 @@ p { text-align: left; }
 
 .contexto { color: var(--muted); margin: 0 0 4px; }
 .data { color: var(--bronze); font-size: 14px; margin: 0 0 16px; }
-
-#indice {
-  padding: 18px 0 6px;
-}
-
-.indice-rotulo {
-  font-size: 11px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin: 0 0 10px;
-}
-
-#indice ul {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 0;
-  margin: 0;
-}
-
-#indice a {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--navy);
-  background: var(--blue-pale);
-  border: 1px solid #C3D3E4;
-  border-radius: 999px;
-  text-decoration: none;
-  transition: background 140ms ease-out, border-color 140ms ease-out;
-}
-
-#indice a span {
-  color: var(--bronze);
-  font-weight: 700;
-}
-
-#indice a:hover {
-  background: var(--gold-soft);
-  border-color: var(--gold);
-}
 
 .cartao {
   background: var(--sand);

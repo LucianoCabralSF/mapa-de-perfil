@@ -32,10 +32,10 @@ test('o botao de salvar em pdf aparece uma unica vez, no fim da pagina', () => {
   assert.ok(html.indexOf('data-acao="imprimir"') > html.indexOf('id="ressalvas"'));
 });
 
-test('o indice se anuncia como clicavel', () => {
+test('o relatorio nao tem indice de secoes no topo', () => {
   const html = montarRelatorio(resultadoDeExemplo());
-  const indice = html.slice(html.indexOf('id="indice"'), html.indexOf('</nav>'));
-  assert.match(indice, /IR DIRETO PARA/i);
+  assert.ok(!html.includes('id="indice"'));
+  assert.ok(!/IR DIRETO PARA/i.test(html));
 });
 
 test('o rodape credita a DEL com e-mail e telefone, e sai no PDF', () => {
@@ -46,12 +46,6 @@ test('o rodape credita a DEL com e-mail e telefone, e sai no PDF', () => {
   assert.ok(rodape.includes('99304-7898'));
   const credito = rodape.slice(rodape.indexOf('credito-del'), rodape.indexOf('credito-del') + 400);
   assert.ok(!credito.includes('sem-impressao'), 'o credito precisa aparecer no PDF');
-});
-
-test('o indice nao lista secao ausente', () => {
-  const html = montarRelatorio(resultadoDeExemplo({ a2: null }));
-  const indice = html.slice(html.indexOf('id="indice"'), html.indexOf('</nav>'));
-  assert.ok(!indice.includes('Adaptado'));
 });
 
 test('nome com html aparece escapado, nunca interpretado', () => {
