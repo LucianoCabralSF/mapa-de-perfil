@@ -271,24 +271,34 @@ por instabilidade em navegadores móveis.
 
 ### 5.1 Estrutura
 
-Arquivo único `index.html` na raiz do repositório, contendo marcação, estilos e
-lógica. Sem framework, sem dependência externa, sem requisição de rede. Os
-gráficos são SVG gerado pelo próprio código.
+`index.html` na raiz, com os módulos JavaScript e a folha de estilo em arquivos
+separados, carregados diretamente pelo navegador. Sem framework, sem
+dependência externa, sem etapa de compilação, sem requisição de rede em tempo
+de uso. Os gráficos são SVG gerado pelo próprio código.
 
-Justificativa: o projeto é pequeno, precisa abrir instantaneamente em celular
-com internet ruim, e o usuário não é programador — um arquivo é mais fácil de
-versionar, entender e publicar.
-
-Organização interna do arquivo, em seções comentadas e independentes:
-
-| Seção | Responsabilidade |
+| Arquivo | Responsabilidade |
 |---|---|
-| ESTILOS | Identidade visual, layout responsivo, folha de impressão |
-| DADOS/ITENS | Os 10 blocos de palavras, as 12 afirmações, as 5 do momento |
-| DADOS/TEXTOS | Biblioteca de textos do relatório |
-| MOTOR | Cálculo de pontuação, tensão, momento, desempate, seleção de textos |
-| TELAS | Navegação entre abertura, blocos e relatório |
-| GRAFICOS | Geração dos SVG |
+| `index.html` | Marcação mínima e ponto de entrada |
+| `estilos.css` | Identidade visual, layout responsivo, folha de impressão |
+| `src/dados.js` | Os 10 blocos de palavras, as 12 afirmações, as 5 do momento |
+| `src/textos.js` | Biblioteca de textos do relatório |
+| `src/motor.js` | Cálculo de pontuação, tensão, momento, desempate |
+| `src/graficos.js` | Geração dos SVG |
+| `src/relatorio.js` | Montagem do HTML do relatório a partir do resultado |
+| `src/telas.js` | Navegação entre abertura, blocos e relatório |
+| `src/app.js` | Amarração dos módulos e início da aplicação |
+| `testes/*.test.js` | Testes automáticos, executados com `node --test` |
+
+Justificativa da separação em vez de arquivo único: a matemática deste projeto
+não é trivial — pontuação relativa, inversão de escala, desempate determinístico
+e índice de tensão. Ela precisa ser testada automaticamente, e código preso
+dentro de um HTML não pode ser testado sem gambiarra. Cada arquivo tem uma
+responsabilidade só, e nenhum deles é grande.
+
+Consequência aceita: por usar módulos do navegador, a página precisa ser
+servida por um endereço web (GitHub Pages resolve) — abrir o arquivo com duplo
+clique no Windows não funciona. Como a distribuição escolhida é por link, isso
+não afeta o uso previsto.
 
 O motor de cálculo não conhece a interface: recebe as respostas e devolve um
 objeto de resultado. Isso permite conferir a matemática isoladamente.
