@@ -41,3 +41,17 @@ test('valores fora da faixa sao aparados em vez de estourar o desenho', () => {
   const larguras = [...svg.matchAll(/class="barra"[^>]*width="([\d.]+)"/g)].map((m) => Number(m[1]));
   assert.ok(larguras.every((l) => l >= 0 && l <= 220));
 });
+
+test('toda barra tem trilho de fundo, para valor zero nao parecer falha de desenho', () => {
+  const comportamento = barrasComportamento({ E: 100, C: 0, P: 50, A: 50 });
+  assert.equal([...comportamento.matchAll(/class="trilho"/g)].length, 4);
+
+  const comparado = barrasComparadas(PCT, { E: 0, C: 0, P: 0, A: 0 });
+  assert.equal([...comparado.matchAll(/class="trilho"/g)].length, 8);
+
+  const motivacoes = barrasMotivacoes(
+    [{ codigo: 'PRO', pct: 0 }, { codigo: 'AUT', pct: 0 }, { codigo: 'REA', pct: 0 }],
+    NOMES_MOTIVADOR,
+  );
+  assert.equal([...motivacoes.matchAll(/class="trilho"/g)].length, 3);
+});

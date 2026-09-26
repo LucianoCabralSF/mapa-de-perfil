@@ -27,10 +27,18 @@ function linha(rotulo, y, barras) {
   return texto + barras;
 }
 
+// Trilho de fundo: sem ele, um valor zero some e parece falha de desenho
+// em vez de resultado.
+function trilho(y, altura) {
+  const raio = altura / 2;
+  return `<rect class="trilho" x="${LARGURA_ROTULO}" y="${y}" width="${LARGURA_BARRA}" height="${altura}" rx="${raio}"/>`;
+}
+
 export function barrasComportamento(pct) {
   const conteudo = FATORES.map((f, i) => {
     const y = i * ALTURA_LINHA;
-    const barra = `<rect class="barra" x="${LARGURA_ROTULO}" y="${y + 4}" width="${larguraDe(pct[f])}" height="16" rx="8"/>`;
+    const barra = trilho(y + 4, 16)
+      + `<rect class="barra" x="${LARGURA_ROTULO}" y="${y + 4}" width="${larguraDe(pct[f])}" height="16" rx="8"/>`;
     const valor = `<text x="${LARGURA - 2}" y="${y + 17}" class="valor" text-anchor="end">${aparar(pct[f])}</text>`;
     return linha(NOMES_FATOR[f], y, barra + valor);
   }).join('');
@@ -41,8 +49,10 @@ export function barrasComparadas(pctNatural, pctAdaptado) {
   const altura = ALTURA_LINHA + 8;
   const conteudo = FATORES.map((f, i) => {
     const y = i * altura;
-    const natural = `<rect class="barra natural" x="${LARGURA_ROTULO}" y="${y + 2}" width="${larguraDe(pctNatural[f])}" height="12" rx="6"/>`;
-    const adaptado = `<rect class="barra adaptado" x="${LARGURA_ROTULO}" y="${y + 18}" width="${larguraDe(pctAdaptado[f])}" height="12" rx="6"/>`;
+    const natural = trilho(y + 2, 12)
+      + `<rect class="barra natural" x="${LARGURA_ROTULO}" y="${y + 2}" width="${larguraDe(pctNatural[f])}" height="12" rx="6"/>`;
+    const adaptado = trilho(y + 18, 12)
+      + `<rect class="barra adaptado" x="${LARGURA_ROTULO}" y="${y + 18}" width="${larguraDe(pctAdaptado[f])}" height="12" rx="6"/>`;
     return linha(NOMES_FATOR[f], y, natural + adaptado);
   }).join('');
   return moldura(FATORES.length * altura, conteudo);
@@ -54,7 +64,8 @@ export function barrasMotivacoes(ranking, nomes) {
     let classe = 'barra';
     if (i < 2) classe = 'barra destaque';
     else if (i === ranking.length - 1) classe = 'barra fraca';
-    const barra = `<rect class="${classe}" x="${LARGURA_ROTULO}" y="${y + 4}" width="${larguraDe(item.pct)}" height="16" rx="8"/>`;
+    const barra = trilho(y + 4, 16)
+      + `<rect class="${classe}" x="${LARGURA_ROTULO}" y="${y + 4}" width="${larguraDe(item.pct)}" height="16" rx="8"/>`;
     const valor = `<text x="${LARGURA - 2}" y="${y + 17}" class="valor" text-anchor="end">${aparar(item.pct)}</text>`;
     return linha(nomes[item.codigo], y, barra + valor);
   }).join('');

@@ -346,6 +346,7 @@ p.destaque {
 .grafico { width: 100%; height: auto; display: block; margin: 12px 0; }
 .grafico .rotulo { font-family: var(--fonte); font-size: 13px; fill: var(--ink); }
 .grafico .valor { font-family: var(--fonte); font-size: 12px; fill: var(--muted); }
+.grafico .trilho { fill: var(--blue-pale); }
 .grafico .barra { fill: var(--navy); }
 .grafico .barra.natural { fill: var(--navy); }
 .grafico .barra.adaptado { fill: var(--gold); }
@@ -395,3 +396,4 @@ p.destaque {
 
   a[href]::after { content: none; }
 }
+
