@@ -72,3 +72,35 @@ export function calcularTensao(pctNatural, pctAdaptado) {
 
   return { indice, faixa, forcado, contido, diferencas };
 }
+
+export const NOMES_MOTIVADOR = {
+  REA: 'Realização',
+  AUT: 'Autonomia',
+  SEG: 'Segurança',
+  REC: 'Reconhecimento',
+  PRO: 'Propósito',
+  PER: 'Pertencimento',
+};
+
+export const MAPA_MOTIVACOES = [
+  'REA', 'AUT', 'SEG', 'REC', 'PRO', 'PER',
+  'AUT', 'REA', 'REC', 'SEG', 'PER', 'PRO',
+];
+
+export function pontuarMotivacoes(respostas) {
+  const brutos = zerados(MOTIVADORES);
+  MAPA_MOTIVACOES.forEach((codigo, indice) => {
+    const nota = respostas[indice];
+    if (typeof nota === 'number') brutos[codigo] += nota;
+  });
+  return MOTIVADORES
+    .map((codigo) => ({
+      codigo,
+      bruto: brutos[codigo],
+      pct: Math.round(((brutos[codigo] - 2) / 8) * 100),
+    }))
+    .sort((a, b) => {
+      if (b.bruto !== a.bruto) return b.bruto - a.bruto;
+      return MOTIVADORES.indexOf(a.codigo) - MOTIVADORES.indexOf(b.codigo);
+    });
+}

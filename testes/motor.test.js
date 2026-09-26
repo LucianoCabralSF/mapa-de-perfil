@@ -6,6 +6,10 @@ import {
   definirPerfil,
   NOMES_FATOR,
   calcularTensao,
+  pontuarMotivacoes,
+  MAPA_MOTIVACOES,
+  MOTIVADORES,
+  NOMES_MOTIVADOR,
 } from '../src/motor.js';
 
 test('FATORES esta na ordem canonica', () => {
@@ -118,4 +122,45 @@ test('as tres faixas respeitam os limites da especificacao', () => {
   assert.equal(calcularTensao(base, { E: 59, C: 41, P: 50, A: 50 }).faixa, 'baixa');
   assert.equal(calcularTensao(base, { E: 70, C: 30, P: 50, A: 50 }).faixa, 'moderada');
   assert.equal(calcularTensao(base, { E: 90, C: 10, P: 50, A: 50 }).faixa, 'alta');
+});
+
+test('o mapa tem 12 afirmacoes, duas por motivador', () => {
+  assert.equal(MAPA_MOTIVACOES.length, 12);
+  for (const codigo of MOTIVADORES) {
+    assert.equal(MAPA_MOTIVACOES.filter((c) => c === codigo).length, 2, `${codigo} precisa de 2 afirmacoes`);
+  }
+});
+
+test('afirmacoes do mesmo motivador nao ficam lado a lado', () => {
+  for (let i = 1; i < MAPA_MOTIVACOES.length; i += 1) {
+    assert.notEqual(MAPA_MOTIVACOES[i], MAPA_MOTIVACOES[i - 1]);
+  }
+});
+
+test('nota maxima nas duas afirmacoes leva o motivador a 100', () => {
+  const respostas = MAPA_MOTIVACOES.map((codigo) => (codigo === 'AUT' ? 5 : 1));
+  const ranking = pontuarMotivacoes(respostas);
+  assert.equal(ranking[0].codigo, 'AUT');
+  assert.equal(ranking[0].bruto, 10);
+  assert.equal(ranking[0].pct, 100);
+  assert.equal(ranking[ranking.length - 1].pct, 0);
+});
+
+test('o ranking traz os seis motivadores em ordem decrescente', () => {
+  const respostas = MAPA_MOTIVACOES.map(() => 3);
+  const ranking = pontuarMotivacoes(respostas);
+  assert.equal(ranking.length, 6);
+  for (let i = 1; i < ranking.length; i += 1) {
+    assert.ok(ranking[i - 1].pct >= ranking[i].pct);
+  }
+});
+
+test('empate geral cai na ordem canonica', () => {
+  const respostas = MAPA_MOTIVACOES.map(() => 3);
+  const ranking = pontuarMotivacoes(respostas);
+  assert.deepEqual(ranking.map((m) => m.codigo), MOTIVADORES);
+});
+
+test('NOMES_MOTIVADOR cobre os seis codigos', () => {
+  assert.deepEqual(Object.keys(NOMES_MOTIVADOR).sort(), [...MOTIVADORES].sort());
 });
