@@ -12,6 +12,7 @@ import {
   NOMES_MOTIVADOR,
   pontuarMomento,
   DIRECOES_MOMENTO,
+  calcularResultado,
 } from '../src/motor.js';
 
 test('FATORES esta na ordem canonica', () => {
@@ -194,4 +195,47 @@ test('meio da escala cai na faixa do meio', () => {
   const { pct, faixa } = pontuarMomento([3, 3, 3, 3, 3]);
   assert.equal(pct, 50);
   assert.equal(faixa, 'movimento');
+});
+
+function respostasDeExemplo(extras = {}) {
+  return {
+    nome: 'Maria',
+    contexto: '',
+    a1: Array.from({ length: 10 }, () => ({ mais: 'E', menos: 'A' })),
+    a2: Array.from({ length: 10 }, () => ({ mais: 'A', menos: 'E' })),
+    b: MAPA_MOTIVACOES.map((c) => (c === 'PRO' ? 5 : 2)),
+    c: [1, 1, 5, 5, 5],
+    ...extras,
+  };
+}
+
+test('resultado completo traz todas as partes', () => {
+  const r = calcularResultado(respostasDeExemplo());
+  assert.equal(r.nome, 'Maria');
+  assert.equal(r.perfil.dominante, 'E');
+  assert.equal(r.motivacoes[0].codigo, 'PRO');
+  assert.equal(r.momento.faixa, 'estavel');
+  assert.equal(r.tensao.faixa, 'alta');
+  assert.match(r.data, /^\d{2}\/\d{2}\/\d{4}$/);
+});
+
+test('sem bloco adaptado nao existe tensao nenhuma', () => {
+  const r = calcularResultado(respostasDeExemplo({ a2: null }));
+  assert.equal(r.adaptado, null);
+  assert.equal(r.tensao, null);
+  assert.equal(r.alertaReforcado, false);
+});
+
+test('alerta reforcado exige momento turbulento e tensao alta juntos', () => {
+  const turbulento = calcularResultado(respostasDeExemplo({ c: [5, 5, 1, 1, 1] }));
+  assert.equal(turbulento.alertaReforcado, true);
+
+  const soTurbulento = calcularResultado(
+    respostasDeExemplo({
+      c: [5, 5, 1, 1, 1],
+      a2: Array.from({ length: 10 }, () => ({ mais: 'E', menos: 'A' })),
+    }),
+  );
+  assert.equal(soTurbulento.tensao.faixa, 'baixa');
+  assert.equal(soTurbulento.alertaReforcado, false);
 });

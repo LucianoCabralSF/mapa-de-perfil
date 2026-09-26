@@ -120,3 +120,35 @@ export function pontuarMomento(respostas) {
   else if (pct >= 26) faixa = 'movimento';
   return { bruto, pct, faixa };
 }
+
+function dataDeHoje() {
+  const agora = new Date();
+  const dd = String(agora.getDate()).padStart(2, '0');
+  const mm = String(agora.getMonth() + 1).padStart(2, '0');
+  return `${dd}/${mm}/${agora.getFullYear()}`;
+}
+
+export function calcularResultado(respostas) {
+  const natural = pontuarComportamento(respostas.a1);
+  const perfil = definirPerfil(natural.brutos);
+  const adaptado = respostas.a2 ? pontuarComportamento(respostas.a2) : null;
+  const tensao = adaptado ? calcularTensao(natural.pct, adaptado.pct) : null;
+  const motivacoes = pontuarMotivacoes(respostas.b);
+  const momento = pontuarMomento(respostas.c);
+  const alertaReforcado = Boolean(
+    tensao && tensao.faixa === 'alta' && momento.faixa === 'turbulento',
+  );
+
+  return {
+    nome: respostas.nome ?? '',
+    contexto: respostas.contexto ?? '',
+    data: dataDeHoje(),
+    natural,
+    perfil,
+    adaptado,
+    tensao,
+    motivacoes,
+    momento,
+    alertaReforcado,
+  };
+}
