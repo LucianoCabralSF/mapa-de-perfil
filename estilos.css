@@ -52,7 +52,7 @@ p { text-align: left; }
 .progresso { margin-bottom: 18px; }
 
 .etapa {
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--bronze);
@@ -74,11 +74,15 @@ p { text-align: left; }
 }
 
 .ancora {
-  font-size: 13px;
-  color: var(--muted);
-  margin: 0 0 14px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--gold-soft);
+  font-size: 17px;
+  line-height: 1.4;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--blue-pale);
+  border-left: 3px solid var(--navy);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 4px 0 18px;
 }
 
 .pergunta {
