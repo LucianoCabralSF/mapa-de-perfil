@@ -25,10 +25,27 @@ test('o relatorio traz todas as secoes previstas', () => {
   }
 });
 
-test('o botao de salvar em pdf aparece duas vezes e sai da impressao', () => {
+test('o botao de salvar em pdf aparece uma unica vez, no fim da pagina', () => {
   const html = montarRelatorio(resultadoDeExemplo());
   const botoes = [...html.matchAll(/class="[^"]*sem-impressao[^"]*"[^>]*data-acao="imprimir"/g)];
-  assert.equal(botoes.length, 2);
+  assert.equal(botoes.length, 1);
+  assert.ok(html.indexOf('data-acao="imprimir"') > html.indexOf('id="ressalvas"'));
+});
+
+test('o indice se anuncia como clicavel', () => {
+  const html = montarRelatorio(resultadoDeExemplo());
+  const indice = html.slice(html.indexOf('id="indice"'), html.indexOf('</nav>'));
+  assert.match(indice, /IR DIRETO PARA/i);
+});
+
+test('o rodape credita a DEL com e-mail e telefone, e sai no PDF', () => {
+  const html = montarRelatorio(resultadoDeExemplo());
+  const rodape = html.slice(html.indexOf('rodape-relatorio'));
+  assert.ok(rodape.includes('DEL'));
+  assert.ok(rodape.includes('diretoriaadmlotus@gmail.com'));
+  assert.ok(rodape.includes('99304-7898'));
+  const credito = rodape.slice(rodape.indexOf('credito-del'), rodape.indexOf('credito-del') + 400);
+  assert.ok(!credito.includes('sem-impressao'), 'o credito precisa aparecer no PDF');
 });
 
 test('o indice nao lista secao ausente', () => {

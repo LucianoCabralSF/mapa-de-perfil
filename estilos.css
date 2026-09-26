@@ -98,24 +98,40 @@ p { text-align: left; }
 .opcao {
   min-height: 56px;
   width: 100%;
-  padding: 10px 16px;
+  padding: 10px 18px;
   font-family: var(--fonte);
   font-size: 17px;
   text-align: left;
   color: var(--ink);
-  background: var(--sand);
+  background: linear-gradient(180deg, #fff 0%, var(--sand) 100%);
   border: 1px solid var(--gold-soft);
-  border-radius: 10px;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(21, 54, 94, 0.08);
   cursor: pointer;
-  transition: background 120ms ease-out, transform 120ms ease-out;
+  transition: background 140ms ease-out, box-shadow 140ms ease-out,
+    border-color 140ms ease-out, transform 100ms ease-out;
 }
 
-.opcao:active { transform: scale(0.99); }
+.opcao:hover {
+  border-color: var(--gold);
+  box-shadow: 0 2px 8px rgba(21, 54, 94, 0.14);
+}
+
+.opcao:active { transform: scale(0.985); }
+
+.opcao:focus-visible,
+.escala-item:focus-visible,
+.botao-principal:focus-visible,
+#indice a:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+}
 
 .opcao.marcada {
-  background: var(--gold);
+  background: linear-gradient(180deg, var(--gold-soft) 0%, var(--gold) 100%);
   border-color: var(--bronze);
   font-weight: 700;
+  box-shadow: 0 2px 8px rgba(140, 121, 80, 0.3);
 }
 
 .opcao.bloqueada {
@@ -133,21 +149,29 @@ p { text-align: left; }
 .escala-item {
   min-height: 52px;
   width: 100%;
-  padding: 8px 16px;
+  padding: 8px 18px;
   font-family: var(--fonte);
   font-size: 16px;
   text-align: left;
   color: var(--ink);
-  background: var(--sand);
+  background: linear-gradient(180deg, #fff 0%, var(--sand) 100%);
   border: 1px solid var(--gold-soft);
-  border-radius: 10px;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(21, 54, 94, 0.08);
   cursor: pointer;
+  transition: border-color 140ms ease-out, box-shadow 140ms ease-out;
+}
+
+.escala-item:hover {
+  border-color: var(--gold);
+  box-shadow: 0 2px 8px rgba(21, 54, 94, 0.14);
 }
 
 .escala-item.marcada {
-  background: var(--gold);
+  background: linear-gradient(180deg, var(--gold-soft) 0%, var(--gold) 100%);
   border-color: var(--bronze);
   font-weight: 700;
+  box-shadow: 0 2px 8px rgba(140, 121, 80, 0.3);
 }
 
 .voltar {
@@ -166,16 +190,25 @@ p { text-align: left; }
   min-height: 56px;
   width: 100%;
   margin-top: auto;
-  padding: 12px 20px;
+  padding: 14px 20px;
   font-family: var(--fonte);
   font-size: 17px;
   font-weight: 700;
+  letter-spacing: 0.3px;
   color: var(--cream);
-  background: var(--navy);
-  border: none;
-  border-radius: 10px;
+  background: linear-gradient(180deg, var(--navy) 0%, var(--navy2) 100%);
+  border: 1px solid var(--navy2);
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(11, 37, 67, 0.25);
   cursor: pointer;
+  transition: box-shadow 140ms ease-out, transform 100ms ease-out;
 }
+
+.botao-principal:hover {
+  box-shadow: 0 4px 16px rgba(11, 37, 67, 0.35);
+}
+
+.botao-principal:active { transform: translateY(1px); }
 
 /* ---------- Abertura e respiro ---------- */
 
@@ -254,23 +287,50 @@ p { text-align: left; }
 .contexto { color: var(--muted); margin: 0 0 4px; }
 .data { color: var(--bronze); font-size: 14px; margin: 0 0 16px; }
 
+#indice {
+  padding: 18px 0 6px;
+}
+
+.indice-rotulo {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 10px;
+}
+
 #indice ul {
   list-style: none;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 16px 0;
+  padding: 0;
   margin: 0;
 }
 
 #indice a {
-  display: inline-block;
-  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
   font-size: 13px;
+  font-weight: 600;
   color: var(--navy);
   background: var(--blue-pale);
+  border: 1px solid #C3D3E4;
   border-radius: 999px;
   text-decoration: none;
+  transition: background 140ms ease-out, border-color 140ms ease-out;
+}
+
+#indice a span {
+  color: var(--bronze);
+  font-weight: 700;
+}
+
+#indice a:hover {
+  background: var(--gold-soft);
+  border-color: var(--gold);
 }
 
 .cartao {
@@ -339,7 +399,24 @@ p.destaque {
 
 .rodape-relatorio p { font-size: 13px; color: var(--muted); }
 
-.cabecalho-relatorio .botao-principal { margin-top: 8px; }
+.rodape-relatorio .botao-principal { margin-bottom: 20px; }
+
+.credito-del {
+  background: var(--navy);
+  color: #fff;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.rodape-relatorio .credito-del p { color: #fff; margin: 0 0 6px; }
+.rodape-relatorio .credito-del .credito-titulo { font-weight: 700; font-size: 14px; }
+.rodape-relatorio .credito-del .credito-chamada { color: var(--gold-soft); }
+.rodape-relatorio .credito-del .credito-contato { margin: 10px 0 0; font-size: 14px; }
+.credito-del a { color: var(--gold); font-weight: 600; text-decoration: none; }
+.credito-separador { color: var(--gold-soft); }
+
+.aviso-legal { font-size: 12px; }
 
 /* ---------- Graficos ---------- */
 
@@ -412,5 +489,15 @@ p.destaque {
   }
 
   a[href]::after { content: none; }
+
+  .credito-del {
+    break-inside: avoid;
+    background: #fff;
+    border: 1px solid var(--navy);
+    padding: 10px 12px;
+  }
+  .rodape-relatorio .credito-del p { color: var(--ink); }
+  .rodape-relatorio .credito-del .credito-chamada { color: var(--bronze); }
+  .credito-del a { color: var(--navy); }
 }
 

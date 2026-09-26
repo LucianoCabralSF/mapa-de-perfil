@@ -36,9 +36,22 @@ function botaoImprimir(posicao) {
 
 function indice(secoes) {
   const itens = secoes
-    .map(({ id, rotulo }) => `<li><a href="#${id}">${rotulo}</a></li>`)
+    .map(({ id, rotulo }) => `<li><a href="#${id}">${rotulo}<span aria-hidden="true">›</span></a></li>`)
     .join('');
-  return `<nav id="indice" class="sem-impressao"><ul>${itens}</ul></nav>`;
+  return '<nav id="indice" class="sem-impressao" aria-label="Seções do relatório">'
+    + '<p class="indice-rotulo">IR DIRETO PARA</p>'
+    + `<ul>${itens}</ul></nav>`;
+}
+
+function creditoDel() {
+  return '<div class="credito-del">'
+    + '<p class="credito-titulo">Ferramenta desenvolvida pela DEL — Desenvolvimento Humano e Gerencial.</p>'
+    + '<p class="credito-chamada">Quer uma ferramenta como esta para a sua empresa? Fale com a gente.</p>'
+    + '<p class="credito-contato">'
+    + '<a href="mailto:diretoriaadmlotus@gmail.com">diretoriaadmlotus@gmail.com</a>'
+    + '<span class="credito-separador"> · </span>'
+    + '<a href="tel:+5592993047898">(92) 99304-7898</a>'
+    + '</p></div>';
 }
 
 function blocoTensao(tensao) {
@@ -112,7 +125,6 @@ export function montarRelatorio(resultado) {
     + `<h1>${escaparHtml(resultado.nome)}</h1>`
     + contexto
     + `<p class="data">${escaparHtml(resultado.data)}</p>`
-    + botaoImprimir('topo')
     + '</header>';
 
   const partes = [
@@ -142,8 +154,11 @@ export function montarRelatorio(resultado) {
     cartao('ambiente', 'Ambiente', paragrafo(AMBIENTE[dominante])),
     cartao('desmotiva', 'O que te desmotiva', blocoDesmotiva(motivacoes)),
     cartao('ressalvas', 'Leia com cuidado', blocoRessalvas(resultado)),
-    `<footer class="rodape-relatorio"><p>${escaparHtml(RODAPE_LEGAL)}</p>`
-      + botaoImprimir('rodape') + '</footer>',
+    '<footer class="rodape-relatorio">'
+      + botaoImprimir('rodape')
+      + creditoDel()
+      + `<p class="aviso-legal">${escaparHtml(RODAPE_LEGAL)}</p>`
+      + '</footer>',
   );
 
   return partes.join('');
