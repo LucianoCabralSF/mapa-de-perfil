@@ -1,0 +1,10 @@
+{
+  "name": "mapa-de-perfil",
+  "version": "1.0.0",
+  "description": "Mapeamento de perfil comportamental e motivacional - DEL / Lotus",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test \"testes/*.test.js\""
+  }
+}
