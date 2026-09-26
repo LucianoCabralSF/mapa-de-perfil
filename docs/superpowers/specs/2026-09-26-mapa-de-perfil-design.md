@@ -311,8 +311,11 @@ objeto de resultado. Isso permite conferir a matemática isoladamente.
 ### 5.3 Validação
 
 - Não avança sem resposta na tela atual.
-- Nos Blocos A1 e A2, a mesma palavra não pode ser marcada como "mais" e
-  "menos" simultaneamente — ao marcar uma, a outra é liberada automaticamente.
+- Nos Blocos A1 e A2, a escolha em dois passos (seção 6.2) torna impossível
+  marcar a mesma palavra como "mais" e "menos": no passo 2, a palavra já
+  escolhida aparece marcada e não aceita toque. Não há mensagem de erro porque
+  não há erro possível.
+- O campo de nome não aceita avançar em branco; qualquer outro dado é opcional.
 
 ### 5.4 Persistência
 
@@ -333,7 +336,100 @@ resultante: `https://lucianocabralsf.github.io/mapa-de-perfil/`
 O push e a ativação do Pages serão feitos pelo próprio usuário. O repositório
 local fica preparado, com README explicando o passo a passo.
 
-## 6. Como será conferido
+## 6. Desenho da experiência
+
+O instrumento tem 37 telas de resposta. Esse é o maior risco do projeto: um
+questionário longo num celular, em sala de aula, com gente cansada no fim do
+dia. Tudo nesta seção existe para reduzir o custo de cada resposta e a sensação
+de distância até o fim.
+
+### 6.1 Princípios
+
+1. **Uma decisão por tela.** Nunca duas perguntas simultâneas.
+2. **Responder custa um toque.** Nada que exija confirmar o que já foi marcado.
+3. **Nunca rolar a tela para responder.** Se não couber, redesenhar a tela.
+4. **O progresso anima em vez de desanimar.** A pessoa nunca vê o número 37.
+5. **Zero burocracia.** Só o primeiro nome. Sem e-mail, telefone ou termos.
+6. **Zero espera.** Tudo roda local; não existe tela de carregamento.
+
+### 6.2 A tela de escolha forçada (dois passos)
+
+É a tela mais repetida do teste: aparece 20 vezes. Funciona em dois passos
+dentro da mesma tela, sem trocar de página:
+
+**Passo 1** — Pergunta "Qual MAIS combina com você?". As 4 palavras aparecem
+como botões grandes empilhados. A pessoa toca em uma.
+
+**Passo 2** — A palavra escolhida fica marcada em dourado e **desabilitada**. A
+pergunta troca, com transição suave, para "E qual MENOS combina?". A pessoa
+toca em outra e a tela avança sozinha.
+
+Consequências desse desenho:
+
+- A validação de "não marcar a mesma palavra duas vezes" deixa de ser uma
+  mensagem de erro e vira impossibilidade física — a opção já marcada não
+  aceita toque. Erro que não pode acontecer não precisa de aviso.
+- O botão voltar no passo 2 retorna ao passo 1 da mesma tela, não à tela
+  anterior. Voltar da tela inteira só a partir do passo 1.
+- São 2 toques por bloco, 40 toques nos dois blocos comportamentais.
+
+### 6.3 Progresso por etapas
+
+A barra de progresso mostra **"Etapa 2 de 4"** e enche dentro da etapa atual,
+reiniciando a cada etapa. As quatro etapas são os quatro blocos.
+
+O total de 37 nunca é exibido. Quatro corridas curtas são psicologicamente mais
+fáceis que uma longa, mesmo somando o mesmo tempo.
+
+Com `INCLUIR_ADAPTADO` desligada, passam a ser 3 etapas, e o contador se ajusta
+sozinho.
+
+### 6.4 Telas de respiro
+
+Três telas de transição, sem pergunta: uma frase curta, o tempo restante
+estimado e um botão. Marcam capítulo vencido e dão descanso visual.
+
+| Posição | Papel |
+|---|---|
+| Entre A1 e A2 | **Virada de âncora.** Avisa que as mesmas palavras vão reaparecer de propósito e que agora a referência é o trabalho de hoje. Sem esta tela, a repetição parece defeito do sistema. |
+| Entre A2 e B | Muda o tipo de pergunta: de palavras para afirmações. Avisa que o ritmo fica mais rápido. |
+| Entre B e C | Anuncia a última etapa, a mais curta: 5 perguntas sobre o momento de vida. |
+
+### 6.5 Ordem dos blocos
+
+A ordem é escolhida pela curva de fadiga, não pela lógica do instrumento:
+
+1. **A1** primeiro — é o bloco mais interessante (palavras sobre si mesmo) e
+   pega a pessoa com energia alta.
+2. **A2** em seguida — é o trecho mais pesado, por repetir o que já foi visto.
+   Fica cedo de propósito, não no fim.
+3. **B** — 12 afirmações com resposta em um toque; ritmo rápido, sensação de
+   avanço veloz.
+4. **C** — apenas 5 perguntas. A reta final parece descida.
+
+### 6.6 Regras de layout para celular
+
+- Altura de referência: a tela inteira cabe em 640 px de altura útil, sem
+  rolagem, incluindo cabeçalho de progresso e botão voltar.
+- Alvo de toque mínimo de 56 px de altura, na metade inferior da tela, ao
+  alcance do polegar.
+- Transição lateral de cerca de 180 ms entre telas — suficiente para dar
+  continuidade, curta demais para irritar na repetição.
+- Avanço automático com atraso de cerca de 250 ms após o toque, para a pessoa
+  ver o que marcou antes da tela trocar.
+- Respeitar `prefers-reduced-motion`: sem animação para quem configurou isso.
+- O botão voltar é discreto mas está em todas as telas de pergunta.
+
+### 6.7 O relatório também precisa de ritmo
+
+O relatório é longo. Para não ser um paredão de texto:
+
+- Abre com o título do perfil e o gráfico — o que a pessoa quer ver primeiro.
+- Cada seção é um cartão visualmente separado, legível isoladamente.
+- Um índice no topo permite pular direto para uma seção.
+- O botão "Salvar em PDF" aparece no topo e no rodapé.
+
+## 7. Como será conferido
 
 - **Matemática**: casos de teste com respostas conhecidas — resposta toda em um
   fator deve produzir aquele fator como dominante; A1 e A2 idênticos devem
@@ -348,9 +444,15 @@ local fica preparado, com README explicando o passo a passo.
   menção a tensão em nenhum outro lugar.
 - **Navegador**: abrir a página, responder do início ao fim, conferir o
   relatório e a prévia de impressão.
-- **Responsividade**: conferir em largura de celular.
+- **Experiência em celular**, em tela de 360 x 640:
+  - nenhuma tela de pergunta exige rolagem;
+  - o segundo toque da escolha forçada avança sozinho;
+  - a palavra marcada como "mais" não aceita ser marcada como "menos";
+  - o botão voltar no passo 2 retorna ao passo 1, não à tela anterior;
+  - o contador de etapas mostra 4 etapas com a chave ligada e 3 com ela
+    desligada.
 
-## 7. Riscos e decisões conscientes
+## 8. Riscos e decisões conscientes
 
 - **Instrumento não é validado psicometricamente.** É inspirado em modelos
   consagrados, mas não passou por estudo de validação. Por isso o rodapé
@@ -358,9 +460,11 @@ local fica preparado, com README explicando o passo a passo.
   teste psicológico — que, no Brasil, é atividade privativa de psicólogo
   (Resolução CFP). O texto do rodapé é parte do produto, não enfeite.
 - **Fadiga de preenchimento.** 37 telas é longo para um celular em sala de
-  aula, e o Bloco A2 repete palavras já vistas. Mitigações: uma pergunta por
-  tela com resposta em um toque, tela de virada explicando a repetição, barra
-  de progresso sempre visível, e a chave de redução como plano B.
+  aula, e o Bloco A2 repete palavras já vistas. É o maior risco do projeto — a
+  seção 6 inteira existe para tratá-lo, e a chave de redução é o plano B. Ainda
+  assim, o desenho só se prova numa turma real: vale um teste com duas ou três
+  pessoas antes da aula, cronometrando e perguntando em que momento deu
+  vontade de desistir.
 - **Escolha forçada incomoda algumas pessoas** ("nenhuma dessas palavras sou
   eu"). Mitigação: a tela de abertura explica que a escolha é relativa, não
   absoluta.
