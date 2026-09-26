@@ -382,10 +382,27 @@ p.destaque {
     page-break-inside: avoid;
     background: #fff;
     border: 1px solid var(--gold-soft);
+    padding: 12px;
+    margin-bottom: 8px;
   }
 
-  .cabecalho-relatorio,
-  .rodape-relatorio { break-inside: avoid; page-break-inside: avoid; }
+  .cartao h3 { margin: 10px 0 2px; }
+  .cartao li { margin-bottom: 4px; }
+
+  .cabecalho-relatorio {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    padding: 0 0 10px;
+  }
+
+  .rodape-relatorio {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    padding: 10px 0 0;
+  }
+
+  .grafico { margin: 8px 0; }
+  .medidor { font-size: 28pt; }
 
   .grafico { max-width: 100%; }
 
