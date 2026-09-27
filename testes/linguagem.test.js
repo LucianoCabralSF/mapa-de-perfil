@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { BLOCOS, PERGUNTAS_MOMENTO } from '../src/dados.js';
+import {
+  SITUACOES, CENARIOS_CONFLITO, ENQUADRAMENTOS_PARES, FRASES_EMOCAO, PERGUNTAS_MOMENTO, FRASES_MOTIVACAO,
+} from '../src/dados.js';
 import * as TEXTOS from '../src/textos.js';
 import { palavrasFlexionadas, textoFlexionado } from './apoio/linguagem.js';
 
@@ -11,10 +13,13 @@ function todosOsTextos(valor) {
   return [];
 }
 
-test('as palavras dos blocos sao neutras', () => {
-  for (const opcao of BLOCOS.flat()) {
-    assert.deepEqual(palavrasFlexionadas(opcao.palavra), [], `palavra no masculino: ${opcao.palavra}`);
-  }
+test('situacoes, cenarios, enquadramentos e frases sao neutros', () => {
+  const todos = [
+    ...SITUACOES.flatMap((s) => [s.enunciado, ...s.opcoes.map((o) => o.texto)]),
+    ...CENARIOS_CONFLITO.flatMap((c) => [c.enunciado, ...c.opcoes.map((o) => o.texto)]),
+    ...ENQUADRAMENTOS_PARES, ...FRASES_EMOCAO, ...Object.values(FRASES_MOTIVACAO).flat(),
+  ];
+  for (const texto of todos) assert.deepEqual(textoFlexionado(texto), [], `texto no masculino: ${texto}`);
 });
 
 test('as perguntas do momento sao neutras', () => {
