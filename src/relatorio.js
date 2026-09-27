@@ -34,6 +34,11 @@ function botaoImprimir(posicao) {
     + ` data-posicao="${posicao}">Salvar em PDF</button>`;
 }
 
+function botaoCompartilhar() {
+  return '<button type="button" class="botao-secundario sem-impressao" data-acao="compartilhar">'
+    + 'Compartilhar meu perfil</button>';
+}
+
 function creditoDel() {
   return '<div class="credito-del">'
     + '<p class="credito-titulo">Ferramenta desenvolvida pela DEL — Desenvolvimento Humano e Gerencial.</p>'
@@ -133,6 +138,7 @@ export function montarRelatorio(resultado) {
     cartao('ressalvas', 'Leia com cuidado', blocoRessalvas(resultado)),
     '<footer class="rodape-relatorio">'
       + botaoImprimir('rodape')
+      + botaoCompartilhar()
       + creditoDel()
       + `<p class="aviso-legal">${escaparHtml(RODAPE_LEGAL)}</p>`
       + '</footer>',

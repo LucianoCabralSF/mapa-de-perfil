@@ -216,6 +216,21 @@ p { text-align: left; }
   transition: box-shadow 140ms ease-out, transform 100ms ease-out;
 }
 
+.botao-secundario {
+  display: block;
+  width: 100%;
+  min-height: 52px;
+  margin: 0 0 20px;
+  font: inherit;
+  font-weight: 700;
+  color: var(--navy);
+  background: transparent;
+  border: 1.5px solid var(--navy);
+  border-radius: 12px;
+  cursor: pointer;
+}
+.botao-secundario:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
+
 .botao-principal:hover {
   box-shadow: 0 4px 16px rgba(11, 37, 67, 0.35);
 }

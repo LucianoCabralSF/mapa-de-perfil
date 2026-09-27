@@ -82,3 +82,8 @@ test('a comparacao explica que usa os blocos respondidos duas vezes', () => {
   const html = montarRelatorio(resultadoDeExemplo());
   assert.ok(html.includes('6 blocos que você respondeu duas vezes'));
 });
+
+test('o botao de compartilhar existe e sai do pdf', () => {
+  const html = montarRelatorio(resultadoDeExemplo());
+  assert.match(html, /class="[^"]*sem-impressao[^"]*"[^>]*data-acao="compartilhar"/);
+});

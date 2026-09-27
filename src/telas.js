@@ -4,6 +4,7 @@ import {
 } from './dados.js';
 import { calcularResultado, PARES_MOTIVACAO, BLOCOS_ADAPTADO } from './motor.js';
 import { montarRelatorio, escaparHtml } from './relatorio.js';
+import { compartilhar, textoCompartilhamento } from './compartilhar.js';
 
 // v2: formato de respostas mudou (A2 com 6 blocos, motivacoes em pares).
 // Sessao salva na v1 simplesmente nao e lida.
@@ -109,6 +110,7 @@ export function criarNavegacao(raiz) {
   let posicao = 0;
   let passo = 'mais';
   let respostas = estadoInicial();
+  let ultimoResultado = null;
 
   function estadoInicial() {
     return {
@@ -256,8 +258,8 @@ export function criarNavegacao(raiz) {
 
   function telaRelatorio() {
     limparEstado();
-    const resultado = calcularResultado(respostas);
-    return montarRelatorio(resultado);
+    ultimoResultado = calcularResultado(respostas);
+    return montarRelatorio(ultimoResultado);
   }
 
   function desenhar() {
@@ -349,6 +351,12 @@ export function criarNavegacao(raiz) {
     else if (acao === 'escala') responderEscala(Number(alvo.dataset.valor));
     else if (acao === 'par') responderPar(alvo.dataset.codigo);
     else if (acao === 'imprimir') window.print();
+    else if (acao === 'compartilhar' && ultimoResultado) {
+      compartilhar(textoCompartilhamento(ultimoResultado), {
+        navegador: navigator,
+        abrir: (url) => window.open(url, '_blank', 'noopener'),
+      });
+    }
     else if (acao === 'voltar') {
       if (telas[posicao].tipo === 'forcada') voltarForcada();
       else voltarTela();
