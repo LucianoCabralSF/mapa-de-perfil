@@ -172,3 +172,13 @@ test('o telefone do rodape abre conversa direta no whatsapp', () => {
   assert.ok(!rodape.includes('href="tel:'), 'o numero nao deve mais abrir o discador');
   assert.ok(rodape.includes('(92) 99304-7898'), 'o numero continua visivel, inclusive no pdf');
 });
+
+test('o whatsapp do rodape e um botao com rotulo claro', () => {
+  const html = montarRelatorio(resultadoDeExemplo());
+  const rodape = html.slice(html.indexOf('credito-del'));
+  assert.match(rodape, /<a class="botao-whatsapp" href="https:\/\/wa\.me\/5592993047898\?text=[^"]+"[^>]*>/);
+  const botao = rodape.slice(rodape.indexOf('class="botao-whatsapp"'), rodape.indexOf('</a>', rodape.indexOf('class="botao-whatsapp"')));
+  assert.ok(botao.includes('Falar com a DEL no WhatsApp'));
+  assert.ok(botao.includes('(92) 99304-7898'));
+  assert.ok(botao.includes('aria-hidden="true"'), 'o icone e decorativo');
+});

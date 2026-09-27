@@ -56,11 +56,13 @@ function creditoDel() {
   return '<div class="credito-del">'
     + '<p class="credito-titulo">Ferramenta desenvolvida pela DEL — Desenvolvimento Humano e Gerencial.</p>'
     + '<p class="credito-chamada">Quer uma ferramenta como esta para a sua empresa? Fale com a gente.</p>'
-    + '<p class="credito-contato">'
-    + '<a href="mailto:diretoriaadmlotus@gmail.com">diretoriaadmlotus@gmail.com</a>'
-    + '<span class="credito-separador"> · </span>'
-    + '<a href="https://wa.me/5592993047898?text=Ol%C3%A1!%20Fiz%20o%20Mapa%20de%20Perfil%20e%20quero%20saber%20mais%20sobre%20as%20ferramentas%20da%20DEL." target="_blank" rel="noopener">(92) 99304-7898</a>'
-    + '</p></div>';
+    + '<a class="botao-whatsapp" href="https://wa.me/5592993047898?text=Ol%C3%A1!%20Fiz%20o%20Mapa%20de%20Perfil%20e%20quero%20saber%20mais%20sobre%20as%20ferramentas%20da%20DEL." target="_blank" rel="noopener">'
+    + '<svg class="icone-conversa" aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">'
+    + '<path d="M12 3C7 3 3 6.6 3 11c0 2.3 1.1 4.4 2.9 5.9L5 21l4.3-2.2c.9.2 1.8.3 2.7.3 5 0 9-3.6 9-8s-4-8-9-8z" fill="currentColor"/></svg>'
+    + '<span class="botao-whatsapp-texto"><strong>Falar com a DEL no WhatsApp</strong>'
+    + '<span class="botao-whatsapp-numero">(92) 99304-7898</span></span></a>'
+    + '<p class="credito-contato">ou pelo e-mail '
+    + '<a href="mailto:diretoriaadmlotus@gmail.com">diretoriaadmlotus@gmail.com</a></p></div>';
 }
 
 function cabecalhoParte(numero, titulo) {
