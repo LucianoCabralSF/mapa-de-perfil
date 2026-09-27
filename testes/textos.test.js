@@ -1,12 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { FATORES, MOTIVADORES } from '../src/motor.js';
+import { FATORES, MOTIVADORES, ESTILOS_CONFLITO, DOMINIOS_EMOCAO } from '../src/motor.js';
 import {
   RETRATOS,
   FORTES,
   ATENCAO,
-  COMUNICACAO,
-  AMBIENTE,
+  SINTESE,
+  CONFLITO_VOCE,
+  EMOCAO_FORTE,
+  EMOCAO_DESENVOLVER,
+  EMOCAO_EQUILIBRADO,
+  EMOCAO_LEITURA,
+  ACAO_FATOR,
+  ACAO_EMOCAO,
+  ACAO_CONFLITO,
   MOTIVADOR_ALTO,
   MOTIVADOR_BAIXO,
   TEXTO_TENSAO,
@@ -19,21 +26,57 @@ import {
   RODAPE_LEGAL,
 } from '../src/textos.js';
 
-test('todo fator tem retrato, fortes, atencao, comunicacao e ambiente', () => {
+const COMBINACOES = ['E', 'C', 'P', 'A', 'EC', 'EP', 'EA', 'CE', 'CP', 'CA', 'PE', 'PC', 'PA', 'AE', 'AC', 'AP'];
+const palavras = (t) => t.trim().split(/\s+/).length;
+
+test('todo fator tem fortes e atencao', () => {
   for (const f of FATORES) {
-    assert.ok(RETRATOS[f], `falta retrato de ${f}`);
     assert.equal(FORTES[f].length, 5, `${f} precisa de 5 pontos fortes`);
     assert.equal(ATENCAO[f].length, 5, `${f} precisa de 5 pontos de atencao`);
-    assert.ok(COMUNICACAO[f], `falta comunicacao de ${f}`);
-    assert.ok(AMBIENTE[f], `falta ambiente de ${f}`);
   }
 });
 
-test('retratos tem tamanho de retrato, nao de legenda', () => {
-  for (const f of FATORES) {
-    const palavras = RETRATOS[f].trim().split(/\s+/).length;
-    assert.ok(palavras >= 50 && palavras <= 90, `retrato de ${f} tem ${palavras} palavras`);
+test('ha um retrato para cada combinacao de dominante e apoio', () => {
+  assert.deepEqual(Object.keys(RETRATOS).sort(), [...COMBINACOES].sort());
+  for (const k of COMBINACOES) {
+    assert.ok(palavras(RETRATOS[k]) >= 70 && palavras(RETRATOS[k]) <= 120, `retrato ${k}: ${palavras(RETRATOS[k])} palavras`);
   }
+});
+
+test('retratos de combinacao nao sao o retrato puro com um acrescimo', () => {
+  for (const k of COMBINACOES.filter((x) => x.length === 2)) {
+    const puro = new Set(RETRATOS[k[0]].split(/[.!?]\s+/));
+    const frases = RETRATOS[k].split(/[.!?]\s+/);
+    const repetidas = frases.filter((f) => puro.has(f)).length;
+    assert.ok(repetidas <= frases.length / 2, `retrato ${k} repete demais o ${k[0]}`);
+  }
+});
+
+test('sintese, conflito, emocoes e acoes cobrem todas as chaves', () => {
+  for (const f of FATORES) {
+    assert.ok(SINTESE[f] && SINTESE[f].length <= 140, `sintese ${f}`);
+    assert.ok(ACAO_FATOR[f], `acao ${f}`);
+  }
+  for (const e of ESTILOS_CONFLITO) {
+    assert.ok(CONFLITO_VOCE[e]?.rende && CONFLITO_VOCE[e]?.custa, `conflito ${e}`);
+    assert.ok(ACAO_CONFLITO[e], `acao conflito ${e}`);
+  }
+  for (const d of DOMINIOS_EMOCAO) {
+    assert.ok(EMOCAO_FORTE[d] && EMOCAO_DESENVOLVER[d] && ACAO_EMOCAO[d], `emocao ${d}`);
+  }
+  assert.ok(EMOCAO_EQUILIBRADO && EMOCAO_LEITURA.includes('percep'));
+});
+
+test('acoes do plano sao praticas e comecam por verbo no imperativo', () => {
+  const acoes = [...Object.values(ACAO_FATOR), ...Object.values(ACAO_EMOCAO), ...Object.values(ACAO_CONFLITO)];
+  for (const a of acoes) {
+    assert.ok(a.length >= 60 && a.length <= 200, `acao: ${a}`);
+    assert.match(a, /^[A-ZÀ-Ú][a-zà-ú]+(e|a|ue|ça|ha)\b/, `acao sem imperativo: ${a}`);
+  }
+});
+
+test('a ressalva final fala da percepcao de si', () => {
+  assert.match(FECHAMENTO_RESSALVA, /percep/);
 });
 
 test('todo motivador tem as duas versoes de texto', () => {
@@ -79,8 +122,6 @@ test('nenhum texto sugere largar o emprego', () => {
   const proibido = /(pedir demiss|largar o emprego|trocar de carreira|procurar outro emprego)/i;
   const todos = [
     ...Object.values(RETRATOS),
-    ...Object.values(COMUNICACAO),
-    ...Object.values(AMBIENTE),
     ...Object.values(TEXTO_TENSAO),
     ...Object.values(FATOR_FORCADO),
     ...Object.values(FATOR_CONTIDO),

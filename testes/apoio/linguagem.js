@@ -15,6 +15,7 @@ const MASCULINOS = [
   'cansado', 'preocupado', 'obrigado', 'convencido', 'sobrecarregado',
   'valorizado', 'visto', 'decidido', 'animado', 'cuidadoso', 'tranquilo',
   'organizado', 'determinado', 'desconfortável demais', 'mais um',
+  'parado', 'pego', 'levado', 'comprometido', 'irritado',
 ];
 
 export function textoFlexionado(texto) {
