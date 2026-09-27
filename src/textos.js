@@ -47,7 +47,7 @@ export const ATENCAO = {
     'O time pode ler sua objetividade como dureza.',
     'Você se impacienta com quem precisa de mais tempo para entender.',
     'Detalhe importante às vezes passa batido na corrida pelo resultado.',
-    'Delegar te custa: você acredita que resolve mais rápido sozinho.',
+    'Delegar te custa: você acredita que resolve mais rápido por conta própria.',
   ],
   C: [
     'Seu entusiasmo às vezes promete mais do que o prazo comporta.',
@@ -61,12 +61,12 @@ export const ATENCAO = {
     'Mudança de rota te desestabiliza mais do que você demonstra.',
     'Dizer não é difícil, e a conta chega como sobrecarga.',
     'Sua calma pode ser lida como falta de posicionamento.',
-    'Você adia decisão difícil esperando que o clima melhore sozinho.',
+    'Você adia decisão difícil esperando que o clima melhore por si só.',
   ],
   A: [
     'A busca pelo certo atrasa a entrega do suficiente.',
     'Sua análise pode virar trava quando falta dado.',
-    'O padrão alto que você usa consigo acaba cobrado dos outros.',
+    'Você acaba cobrando dos outros o mesmo padrão alto que usa consigo.',
     'Crítica ao seu trabalho te atinge mais do que você admite.',
     'Você evita arriscar mesmo quando o risco é pequeno.',
   ],
@@ -75,7 +75,7 @@ export const ATENCAO = {
 export const COMUNICACAO = {
   E: 'Funciona: ir direto ao assunto, trazer o ponto principal na primeira frase e dizer o que se espera de você. Trava: rodeio, reunião longa sem decisão e explicação detalhada antes do objetivo.',
   C: 'Funciona: conversar antes de formalizar, reconhecer o que você fez e deixar espaço para você pensar em voz alta. Trava: comunicado seco por escrito, crítica em público e ambiente onde ninguém responde.',
-  P: 'Funciona: avisar com antecedência, explicar o porquê da mudança e dar tempo para você processar. Trava: decisão em cima da hora, tom agressivo e ser colocado no centro das atenções sem aviso.',
+  P: 'Funciona: avisar com antecedência, explicar o porquê da mudança e dar tempo para você processar. Trava: decisão em cima da hora, tom agressivo e virar o centro das atenções sem aviso.',
   A: 'Funciona: trazer dado, critério claro e tempo para conferir antes de responder. Trava: cobrança de resposta imediata, informação solta sem fonte e mudança de regra no meio do caminho.',
 };
 
@@ -90,7 +90,7 @@ export const MOTIVADOR_ALTO = {
   REA: 'Você acende diante de um desafio difícil. Meta clara e progresso visível te dão energia; tarefa fácil demais te apaga.',
   AUT: 'Você rende quando tem liberdade para decidir o caminho. Confiança vale mais para você do que instrução detalhada.',
   SEG: 'Previsibilidade te dá tranquilidade para produzir. Saber o que vem pela frente importa mais para você do que a novidade.',
-  REC: 'Ser visto e valorizado pelo que entrega faz diferença real no seu ânimo. Trabalho reconhecido rende o dobro em você.',
+  REC: 'Receber reconhecimento pelo que você entrega faz diferença real no seu ânimo. Quando há reconhecimento, você rende o dobro.',
   PRO: 'Você precisa enxergar para que serve o que faz. Sentido importa mais do que status, e isso sustenta você em período difícil.',
   PER: 'O vínculo com o time é o que te prende. Trabalhar com gente de quem você gosta muda sua disposição de forma direta.',
 };
@@ -101,7 +101,7 @@ export const MOTIVADOR_BAIXO = {
   SEG: 'Estabilidade não é o que te segura. Rotina previsível demais cansa você mais do que a incerteza.',
   REC: 'Aplauso e visibilidade importam pouco para você. Cargo e título não são o que te fazem levantar da cama.',
   PRO: 'Causa e propósito não são o centro da sua motivação. Você separa o trabalho do sentido de vida sem sofrer com isso.',
-  PER: 'Pertencer ao grupo pesa pouco na sua decisão. Você trabalha bem sozinho e não sente falta do vínculo do time.',
+  PER: 'Pertencer ao grupo pesa pouco na sua decisão. Você trabalha bem por conta própria e não sente falta do vínculo do time.',
 };
 
 export const TEXTO_TENSAO = {
@@ -112,7 +112,7 @@ export const TEXTO_TENSAO = {
 
 export const FATOR_FORCADO = {
   E: 'O ambiente está pedindo mais firmeza e velocidade de decisão do que é natural em você. Você tem assumido a frente em situações que normalmente deixaria para outro.',
-  C: 'O ambiente está pedindo mais exposição e articulação do que é natural em você. Você tem falado, convencido e circulado mais do que seu ritmo pede.',
+  C: 'O ambiente está pedindo mais exposição e articulação do que é natural em você. Você tem falado, buscado convencer e circulado mais do que seu ritmo pede.',
   P: 'O ambiente está pedindo mais paciência e constância do que é natural em você. Você tem segurado o próprio ritmo para acompanhar o dos outros.',
   A: 'O ambiente está pedindo mais controle e precisão do que é natural em você. Você tem conferido, documentado e revisado mais do que sua natureza pede.',
 };

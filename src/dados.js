@@ -7,36 +7,37 @@ export const ANCORA_A1 = 'Como você é na maior parte da sua vida, fora de qual
 export const ANCORA_A2 = 'Como você sente que precisa ser no seu trabalho (ou estudo) hoje, para dar conta do que esperam de você.';
 
 // Ordem canonica das opcoes em todos os blocos: E, C, P, A.
+// Palavras neutras: nenhuma flexao no masculino (ver testes/linguagem.test.js).
 export const BLOCOS = [
   [
-    { fator: 'E', palavra: 'Decidido' },
-    { fator: 'C', palavra: 'Animado' },
-    { fator: 'P', palavra: 'Paciente' },
-    { fator: 'A', palavra: 'Cuidadoso' },
+    { fator: 'E', palavra: 'Tomo decisões' },
+    { fator: 'C', palavra: 'Animo as pessoas' },
+    { fator: 'P', palavra: 'Tenho paciência' },
+    { fator: 'A', palavra: 'Tenho cautela' },
   ],
   [
-    { fator: 'E', palavra: 'Direto' },
-    { fator: 'C', palavra: 'Falante' },
-    { fator: 'P', palavra: 'Calmo' },
-    { fator: 'A', palavra: 'Detalhista' },
+    { fator: 'E', palavra: 'Falo sem rodeio' },
+    { fator: 'C', palavra: 'Falo com facilidade' },
+    { fator: 'P', palavra: 'Mantenho a calma' },
+    { fator: 'A', palavra: 'Reparo nos detalhes' },
   ],
   [
-    { fator: 'E', palavra: 'Competitivo' },
-    { fator: 'C', palavra: 'Entusiasmado' },
-    { fator: 'P', palavra: 'Leal' },
-    { fator: 'A', palavra: 'Preciso' },
+    { fator: 'E', palavra: 'Gosto de competir' },
+    { fator: 'C', palavra: 'Me empolgo fácil' },
+    { fator: 'P', palavra: 'Sou de confiança' },
+    { fator: 'A', palavra: 'Busco precisão' },
   ],
   [
-    { fator: 'E', palavra: 'Ousado' },
-    { fator: 'C', palavra: 'Sociável' },
-    { fator: 'P', palavra: 'Constante' },
-    { fator: 'A', palavra: 'Organizado' },
+    { fator: 'E', palavra: 'Arrisco' },
+    { fator: 'C', palavra: 'Faço amizade fácil' },
+    { fator: 'P', palavra: 'Mantenho o ritmo' },
+    { fator: 'A', palavra: 'Mantenho a ordem' },
   ],
   [
-    { fator: 'E', palavra: 'Determinado' },
-    { fator: 'C', palavra: 'Otimista' },
-    { fator: 'P', palavra: 'Tranquilo' },
-    { fator: 'A', palavra: 'Criterioso' },
+    { fator: 'E', palavra: 'Persigo a meta' },
+    { fator: 'C', palavra: 'Vejo o lado bom' },
+    { fator: 'P', palavra: 'Levo com tranquilidade' },
+    { fator: 'A', palavra: 'Uso critério' },
   ],
   [
     { fator: 'E', palavra: 'Assumo o comando' },
@@ -45,10 +46,10 @@ export const BLOCOS = [
     { fator: 'A', palavra: 'Confiro tudo' },
   ],
   [
-    { fator: 'E', palavra: 'Decido rápido' },
-    { fator: 'C', palavra: 'Expressivo' },
-    { fator: 'P', palavra: 'Previsível' },
-    { fator: 'A', palavra: 'Metódico' },
+    { fator: 'E', palavra: 'Resolvo na hora' },
+    { fator: 'C', palavra: 'Me expresso muito' },
+    { fator: 'P', palavra: 'Evito surpresas' },
+    { fator: 'A', palavra: 'Sigo um método' },
   ],
   [
     { fator: 'E', palavra: 'Gosto de desafio' },
@@ -57,10 +58,10 @@ export const BLOCOS = [
     { fator: 'A', palavra: 'Gosto de regras' },
   ],
   [
-    { fator: 'E', palavra: 'Impaciente' },
-    { fator: 'C', palavra: 'Espontâneo' },
-    { fator: 'P', palavra: 'Prestativo' },
-    { fator: 'A', palavra: 'Reservado' },
+    { fator: 'E', palavra: 'Tenho pressa' },
+    { fator: 'C', palavra: 'Improviso bem' },
+    { fator: 'P', palavra: 'Ajudo sem pedir' },
+    { fator: 'A', palavra: 'Prefiro observar' },
   ],
   [
     { fator: 'E', palavra: 'Foco no resultado' },
@@ -92,7 +93,7 @@ export const PERGUNTAS_MOMENTO = [
   'Nas últimas semanas, tenho sentido muita pressão e cobrança.',
   'Passei por mudanças importantes nos últimos 6 meses (trabalho, moradia, família ou saúde).',
   'Tenho dormido e descansado bem.',
-  'Estou satisfeito com minha situação atual de trabalho ou estudo.',
+  'Sinto satisfação com minha situação atual de trabalho ou estudo.',
   'Minha vida hoje está previsível e sob controle.',
 ];
 
