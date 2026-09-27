@@ -423,6 +423,16 @@ p.destaque {
 .grafico .barra.destaque { fill: var(--gold); }
 .grafico .barra.fraca { fill: var(--muted); }
 
+/* ---------- Telas da v3: situacoes, rotulo de passo, frases ---------- */
+
+.contexto-tela { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--bronze); margin: 4px 0 6px; }
+.enunciado { font-size: 19px; line-height: 1.4; font-weight: 700; color: var(--navy); margin: 0 0 16px; }
+.rotulo-passo { font-size: 12px; letter-spacing: 1.5px; color: var(--bronze); margin: 0 0 10px; }
+.frase-item { font-size: 16px; line-height: 1.45; color: var(--ink); margin: 14px 0 8px; }
+.escala-linha { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 8px; }
+.escala-linha .escala-item { min-height: 48px; font-size: 12px; line-height: 1.2; padding: 4px; text-align: center; }
+.opcao { text-align: left; line-height: 1.35; }
+
 /* ---------- Paginas de texto (metodo, facilitador) ---------- */
 
 .pagina-texto { max-width: 720px; margin: 0 auto; padding: 28px 20px 56px; }

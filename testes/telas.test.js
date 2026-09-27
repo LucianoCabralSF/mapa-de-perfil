@@ -1,35 +1,44 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  montarSequencia, CHAVE, htmlAbertura, sessaoValida, assinaturaSequencia,
+  montarSequencia, CHAVE, htmlAbertura, sessaoValida, assinaturaSequencia, textoPergunta,
 } from '../src/telas.js';
 import { INCLUIR_ADAPTADO } from '../src/dados.js';
 
-const RESPOSTA = new Set(['forcada', 'par', 'escala']);
-
-test('a sequencia tem 36 telas de resposta com o adaptado ligado', () => {
+test('a sequencia tem 49 telas de resposta com o adaptado ligado', () => {
   assert.equal(INCLUIR_ADAPTADO, true);
   const telas = montarSequencia();
-  const conta = (filtro) => telas.filter(filtro).length;
-  assert.equal(conta((t) => t.tipo === 'forcada' && t.campo === 'a1'), 10);
+  const conta = (f) => telas.filter(f).length;
+  assert.equal(conta((t) => t.tipo === 'forcada' && t.campo === 'a1'), 12);
   assert.equal(conta((t) => t.tipo === 'forcada' && t.campo === 'a2'), 6);
+  assert.equal(conta((t) => t.tipo === 'forcada' && t.campo === 'conflito'), 6);
   assert.equal(conta((t) => t.tipo === 'par'), 15);
-  assert.equal(conta((t) => t.tipo === 'escala'), 5);
-  assert.equal(conta((t) => RESPOSTA.has(t.tipo)), 36);
+  assert.equal(conta((t) => t.tipo === 'multipla' && t.itens[0].campo === 'emocoes'), 8);
+  assert.equal(conta((t) => t.tipo === 'multipla' && t.itens[0].campo === 'c'), 2);
+  assert.equal(conta((t) => ['forcada', 'par', 'multipla'].includes(t.tipo)), 49);
+});
+
+test('nenhuma tela de resposta repete o texto de pergunta de outra', () => {
+  const textos = montarSequencia().filter((t) => t.tipo !== 'respiro' && textoPergunta(t)).map(textoPergunta);
+  assert.equal(new Set(textos).size, textos.length);
+});
+
+test('telas de emocao juntam duas frases', () => {
+  const telas = montarSequencia().filter((t) => t.tipo === 'multipla' && t.itens[0].campo === 'emocoes');
+  for (const t of telas) assert.equal(t.itens.length, 2);
 });
 
 test('toda tela de resposta aponta para uma posicao valida', () => {
-  for (const tela of montarSequencia()) {
-    if (tela.tipo === 'forcada') {
-      const limite = tela.campo === 'a1' ? 10 : 6;
-      assert.ok(tela.indiceResposta >= 0 && tela.indiceResposta < limite);
-    }
-    if (tela.tipo === 'par') assert.ok(tela.indice >= 0 && tela.indice < 15);
+  const limites = { a1: 12, a2: 6, conflito: 6, b: 15, emocoes: 16, c: 5 };
+  for (const t of montarSequencia()) {
+    if (t.tipo === 'forcada') assert.ok(t.indiceResposta >= 0 && t.indiceResposta < limites[t.campo]);
+    if (t.tipo === 'par') assert.ok(t.indice < 15);
+    if (t.tipo === 'multipla') for (const i of t.itens) assert.ok(i.indice < limites[i.campo]);
   }
 });
 
-test('a chave de armazenamento e a da versao 2', () => {
-  assert.equal(CHAVE, 'mapa-de-perfil-v2');
+test('a chave de armazenamento e a da versao 3', () => {
+  assert.equal(CHAVE, 'mapa-de-perfil-v3');
 });
 
 test('nenhum respiro promete mais tempo do que o anterior', () => {
@@ -59,9 +68,11 @@ function sessaoDeExemplo(extras = {}, respostasExtras = {}) {
     respostas: {
       nome: 'Ana',
       contexto: '',
-      a1: Array.from({ length: 10 }, () => ({ mais: 'E', menos: null })),
+      a1: Array.from({ length: 12 }, () => ({ mais: 'E', menos: null })),
       a2: Array.from({ length: 6 }, () => ({ mais: null, menos: null })),
+      conflito: Array.from({ length: 6 }, () => ({ mais: null, menos: null })),
       b: Array.from({ length: 15 }, () => null),
+      emocoes: Array.from({ length: 16 }, () => null),
       c: [3, null, null, null, null],
       ...respostasExtras,
     },
@@ -83,8 +94,12 @@ test('sessao com respostas no formato errado e descartada', () => {
   const telas = montarSequencia();
   const casos = {
     'a2 ausente com o adaptado ligado': { a2: null },
-    'bloco do a1 vazio': { a1: [null, ...Array.from({ length: 9 }, () => ({ mais: null, menos: null }))] },
-    'fator inexistente': { a1: Array.from({ length: 10 }, () => ({ mais: 'Z', menos: null })) },
+    'bloco do a1 vazio': { a1: [null, ...Array.from({ length: 11 }, () => ({ mais: null, menos: null }))] },
+    'fator inexistente': { a1: Array.from({ length: 12 }, () => ({ mais: 'Z', menos: null })) },
+    'conflito com estilo estranho': { conflito: Array.from({ length: 6 }, () => ({ mais: 'E', menos: null })) },
+    'emocoes curtas': { emocoes: [3, 3] },
+    'emocoes fora da escala': { emocoes: Array.from({ length: 16 }, () => 8) },
+    'sessao da v2 sem conflito': { conflito: undefined },
     'a1 curto': { a1: [] },
     'b do formato antigo': { b: Array.from({ length: 12 }, () => 3) },
     'b com codigo estranho': { b: Array.from({ length: 15 }, () => 'XYZ') },
@@ -147,4 +162,25 @@ test('fazer de novo apaga a sessao e volta para a abertura', async () => {
   const depois = JSON.parse(guardado.get(CHAVE) ?? 'null');
   assert.ok(!depois || depois.posicao === 0, 'a sessao do relatorio anterior foi descartada');
   assert.ok(!depois || depois.respostas.nome === '', 'o nome anterior foi apagado');
+});
+
+test('reabrir uma tela de duas frases com uma respondida nao avanca sozinho', async () => {
+  const { criarNavegacao } = await import('../src/telas.js');
+  const guardado = new Map();
+  globalThis.sessionStorage = {
+    getItem: (k) => (guardado.has(k) ? guardado.get(k) : null),
+    setItem: (k, v) => { guardado.set(k, String(v)); },
+    removeItem: (k) => { guardado.delete(k); },
+  };
+  globalThis.window = { scrollTo() {} };
+  const telas = montarSequencia();
+  const pos = telas.findIndex((t) => t.tipo === 'multipla' && t.itens[0].campo === 'emocoes');
+  const sessao = sessaoDeExemplo({ posicao: pos });
+  sessao.respostas.emocoes[telas[pos].itens[0].indice] = 4;
+  guardado.set(CHAVE, JSON.stringify(sessao));
+  const raiz = { innerHTML: '', addEventListener() {}, querySelector: () => null };
+  criarNavegacao(raiz).iniciar();
+  await new Promise((ok) => setTimeout(ok, 400));
+  assert.equal(JSON.parse(guardado.get(CHAVE)).posicao, pos, 'continua na mesma tela');
+  assert.match(raiz.innerHTML, /data-valor="4"[^>]*aria-pressed="true"|aria-pressed="true"[^>]*data-valor="4"/);
 });
