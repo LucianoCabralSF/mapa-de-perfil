@@ -1,11 +1,13 @@
 import {
-  BLOCOS, AFIRMACOES, PERGUNTAS_MOMENTO, ESCALA_CONCORDANCIA,
-  ANCORA_A1, ANCORA_A2, ordemExibicaoA2, INCLUIR_ADAPTADO,
+  BLOCOS, PERGUNTAS_MOMENTO, ESCALA_CONCORDANCIA,
+  ANCORA_A1, ANCORA_A2, ordemExibicaoA2, montarPares, INCLUIR_ADAPTADO,
 } from './dados.js';
-import { calcularResultado, BLOCOS_ADAPTADO } from './motor.js';
+import { calcularResultado, PARES_MOTIVACAO, BLOCOS_ADAPTADO } from './motor.js';
 import { montarRelatorio, escaparHtml } from './relatorio.js';
 
-const CHAVE = 'mapa-de-perfil-v1';
+// v2: formato de respostas mudou (A2 com 6 blocos, motivacoes em pares).
+// Sessao salva na v1 simplesmente nao e lida.
+export const CHAVE = 'mapa-de-perfil-v2';
 const ATRASO_AVANCO = 250;
 
 // ---------- Persistencia protegida ----------
@@ -40,7 +42,7 @@ function limparEstado() {
 
 // ---------- Sequencia de telas ----------
 
-function montarSequencia() {
+export function montarSequencia() {
   const telas = [{ tipo: 'abertura' }, { tipo: 'identificacao' }];
   const etapas = INCLUIR_ADAPTADO ? 4 : 3;
   let etapa = 1;
@@ -57,7 +59,7 @@ function montarSequencia() {
       tipo: 'respiro',
       texto: 'Primeira parte concluída. Agora as mesmas palavras voltam, de propósito.',
       detalhe: 'Desta vez, pense no seu trabalho de hoje: como você precisa ser ali, não como você é.',
-      tempo: 'Faltam cerca de 9 minutos.',
+      tempo: 'Faltam cerca de 7 minutos.',
     });
     ordemExibicaoA2().forEach((item) => {
       telas.push({
@@ -76,11 +78,13 @@ function montarSequencia() {
   telas.push({
     tipo: 'respiro',
     texto: 'Acabaram as palavras.',
-    detalhe: 'Agora são frases. Você só marca o quanto concorda com cada uma. O ritmo fica mais rápido.',
+    detalhe: 'Agora são pares de frases sobre trabalho. Em cada tela, toque na que pesa mais para você. É rápido.',
     tempo: 'Faltam cerca de 4 minutos.',
   });
-  AFIRMACOES.forEach((texto, indice) => {
-    telas.push({ tipo: 'escala', campo: 'b', indice, texto, etapa, etapas });
+  montarPares().forEach((par, indice) => {
+    telas.push({
+      tipo: 'par', campo: 'b', indice, esquerda: par.esquerda, direita: par.direita, etapa, etapas,
+    });
   });
 
   etapa += 1;
@@ -112,7 +116,7 @@ export function criarNavegacao(raiz) {
       contexto: '',
       a1: BLOCOS.map(() => ({ mais: null, menos: null })),
       a2: INCLUIR_ADAPTADO ? BLOCOS_ADAPTADO.map(() => ({ mais: null, menos: null })) : null,
-      b: AFIRMACOES.map(() => null),
+      b: PARES_MOTIVACAO.map(() => null),
       c: PERGUNTAS_MOMENTO.map(() => null),
     };
   }
@@ -165,7 +169,7 @@ export function criarNavegacao(raiz) {
       + '<h1>Mapa de Perfil.</h1>'
       + '<p>Um retrato de como você age, do que te move e de quanto o seu momento de '
       + 'vida está influenciando as duas coisas.</p>'
-      + '<p>São cerca de 13 minutos. Responda sem pensar muito: a primeira reação costuma '
+      + '<p>São cerca de 10 minutos. Responda sem pensar muito: a primeira reação costuma '
       + 'ser a mais verdadeira.</p>'
       + '<p>Em várias telas você vai escolher entre palavras que talvez combinem todas com '
       + 'você, ou nenhuma. Escolha a que <strong>mais</strong> e a que <strong>menos</strong> '
@@ -234,6 +238,22 @@ export function criarNavegacao(raiz) {
       + '</div>';
   }
 
+  function telaPar(tela) {
+    const atual = respostas.b[tela.indice];
+    const botao = (lado) => {
+      const classe = atual === lado.codigo ? 'opcao marcada' : 'opcao';
+      return `<button type="button" class="${classe}" data-acao="par" data-codigo="${lado.codigo}">`
+        + `${escaparHtml(lado.frase)}</button>`;
+    };
+    return '<div class="tela">'
+      + progresso(tela)
+      + '<p class="ancora">No trabalho, o que pesa mais para você?</p>'
+      + '<p class="pergunta">Escolha uma das duas.</p>'
+      + `<div class="opcoes">${botao(tela.esquerda)}<p class="ou" aria-hidden="true">ou</p>${botao(tela.direita)}</div>`
+      + botaoVoltar()
+      + '</div>';
+  }
+
   function telaRelatorio() {
     limparEstado();
     const resultado = calcularResultado(respostas);
@@ -247,6 +267,7 @@ export function criarNavegacao(raiz) {
     else if (tela.tipo === 'respiro') raiz.innerHTML = telaRespiro(tela);
     else if (tela.tipo === 'forcada') raiz.innerHTML = telaForcada(tela);
     else if (tela.tipo === 'escala') raiz.innerHTML = telaEscala(tela);
+    else if (tela.tipo === 'par') raiz.innerHTML = telaPar(tela);
     else raiz.innerHTML = telaRelatorio();
     window.scrollTo(0, 0);
   }
@@ -277,6 +298,14 @@ export function criarNavegacao(raiz) {
     respostas[tela.campo][tela.indice] = valor;
     guardar();
     marcarEsperando(String(valor), 'valor');
+    setTimeout(avancar, ATRASO_AVANCO);
+  }
+
+  function responderPar(codigo) {
+    const tela = telas[posicao];
+    respostas.b[tela.indice] = codigo;
+    guardar();
+    marcarEsperando(codigo, 'codigo');
     setTimeout(avancar, ATRASO_AVANCO);
   }
 
@@ -318,6 +347,7 @@ export function criarNavegacao(raiz) {
     else if (acao === 'identificar') identificar();
     else if (acao === 'forcada') responderForcada(alvo.dataset.fator);
     else if (acao === 'escala') responderEscala(Number(alvo.dataset.valor));
+    else if (acao === 'par') responderPar(alvo.dataset.codigo);
     else if (acao === 'imprimir') window.print();
     else if (acao === 'voltar') {
       if (telas[posicao].tipo === 'forcada') voltarForcada();

@@ -99,6 +99,15 @@ p { text-align: left; }
   margin-top: auto;
 }
 
+.ou {
+  margin: 0;
+  text-align: center;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--bronze);
+}
+
 .opcao {
   min-height: 56px;
   width: 100%;
