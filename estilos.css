@@ -460,6 +460,19 @@ p.destaque {
 .quadro .rotulo-quadro { font-family: var(--fonte); font-size: 11px; fill: var(--muted); }
 .quadro .ponto { fill: var(--gold); stroke: var(--navy); stroke-width: 2; }
 
+/* ---------- Relatorio v3: resumo e partes ---------- */
+
+.cabecalho-parte { margin: 32px 0 10px; border-top: 1px solid var(--gold-soft); padding-top: 18px; }
+.titulo-parte { color: var(--navy); font-size: 26px; line-height: 1.2; margin: 0; }
+.resumo-grade { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 12px 0; }
+@media (min-width: 560px) { .resumo-grade { grid-template-columns: repeat(3, 1fr); } }
+.resumo-item { background: #fff; border: 1px solid var(--gold-soft); border-radius: 10px; padding: 10px 12px; }
+.resumo-rotulo { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--bronze); margin: 0 0 4px; }
+.resumo-valor { font-weight: 700; color: var(--navy); margin: 0; }
+.resumo-alertas { color: var(--ink); margin: 8px 0 0; padding-left: 20px; }
+.cartao ol { padding-left: 22px; }
+.cartao ol li { margin-bottom: 8px; line-height: 1.5; }
+
 /* ---------- Acessibilidade ---------- */
 
 @media (prefers-reduced-motion: reduce) {
@@ -475,6 +488,9 @@ p.destaque {
 /* ---------- Impressao ---------- */
 
 @media print {
+  .quebra-pagina { break-before: page; page-break-before: always; }
+  .resumo-grade { grid-template-columns: repeat(3, 1fr); }
+  .cabecalho-parte { break-after: avoid; page-break-after: avoid; }
   .cartao-perfil, .pagina-texto section { break-inside: avoid; page-break-inside: avoid; }
   .voltar-link { display: none; }
   .sem-impressao { display: none !important; }

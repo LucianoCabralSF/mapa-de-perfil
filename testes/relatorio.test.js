@@ -1,28 +1,93 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { calcularResultado, PARES_MOTIVACAO } from '../src/motor.js';
-import { montarRelatorio, escaparHtml } from '../src/relatorio.js';
+import {
+  calcularResultado, PARES_MOTIVACAO, MAPA_EMOCOES, NOMES_ESTILO, NOMES_DOMINIO,
+} from '../src/motor.js';
+import {
+  montarRelatorio, escaparHtml, acoesDoPlano, perguntasDaConversa,
+} from '../src/relatorio.js';
 
 function resultadoDeExemplo(extras = {}) {
   return calcularResultado({
     nome: 'Maria',
     contexto: 'Analista de RH',
-    a1: Array.from({ length: 10 }, () => ({ mais: 'E', menos: 'A' })),
+    a1: Array.from({ length: 12 }, () => ({ mais: 'E', menos: 'A' })),
     a2: Array.from({ length: 6 }, () => ({ mais: 'A', menos: 'E' })),
+    conflito: Array.from({ length: 6 }, () => ({ mais: 'COM', menos: 'CED' })),
     b: PARES_MOTIVACAO.map(([a, b]) => (a === 'PRO' || b === 'PRO' ? 'PRO' : a)),
+    emocoes: MAPA_EMOCOES.map((m, i) => (i === 3 || i === 7 ? 2 : 4)),
     c: [5, 5, 1, 1, 1],
     ...extras,
   });
 }
 
-test('o relatorio traz todas as secoes previstas', () => {
+test('o relatorio tem resumo, parte 1 e parte 2 em pagina nova', () => {
   const html = montarRelatorio(resultadoDeExemplo());
-  for (const titulo of [
-    'Seu perfil', 'Natural', 'Momento', 'motiva', 'Pontos fortes',
-    'Pontos de atenção', 'Como se comunicar', 'Ambiente', 'Leia com cuidado',
-  ]) {
-    assert.ok(html.includes(titulo), `falta a secao: ${titulo}`);
+  const iResumo = html.indexOf('id="resumo"');
+  const iP1 = html.indexOf('id="parte1"');
+  const iQuebra = html.indexOf('class="quebra-pagina"');
+  const iP2 = html.indexOf('id="parte2"');
+  assert.ok(iResumo > -1 && iResumo < iP1 && iP1 < iQuebra && iQuebra < iP2);
+  for (const titulo of ['Seu perfil', 'Diante de conflito', 'Como você lida com emoções', 'Plano de desenvolvimento', 'Leia com cuidado']) {
+    assert.ok(html.slice(iP1, iQuebra).includes(titulo), `parte 1 sem: ${titulo}`);
   }
+  for (const titulo of ['Em uma frase', 'Como se comunicar', 'Como dar retorno', 'Como delegar', 'Em conflito', 'Sinais de desgaste', 'O que evitar', 'Perguntas para a próxima conversa', 'Como usar este relatório']) {
+    assert.ok(html.slice(iP2).includes(titulo), `parte 2 sem: ${titulo}`);
+  }
+});
+
+test('a parte 2 fala da pessoa pelo nome', () => {
+  const html = montarRelatorio(resultadoDeExemplo({ nome: 'Joana' }));
+  const p2 = html.slice(html.indexOf('id="parte2"'), html.indexOf('rodape-relatorio'));
+  assert.ok(p2.includes('Para quem lidera Joana'));
+  assert.ok((p2.match(/Joana/g) || []).length >= 3);
+  assert.ok(!p2.includes('{nome}'));
+});
+
+test('nome com apostrofo e html aparece escapado na parte 2', () => {
+  const html = montarRelatorio(resultadoDeExemplo({ nome: "D'Ávila <b>" }));
+  const p2 = html.slice(html.indexOf('id="parte2"'));
+  assert.ok(p2.includes('D&#39;Ávila &lt;b&gt;'));
+  assert.ok(!p2.includes('<b>'));
+});
+
+test('o plano tem exatamente tres acoes, inclusive com emocoes equilibradas', () => {
+  assert.equal(acoesDoPlano(resultadoDeExemplo()).length, 3);
+  const equilibrado = resultadoDeExemplo({ emocoes: MAPA_EMOCOES.map((m) => (m.invertida ? 2 : 4)) });
+  assert.equal(equilibrado.emocoes.equilibrado, true);
+  const acoes = acoesDoPlano(equilibrado);
+  assert.equal(acoes.length, 3);
+  assert.ok(acoes.every(Boolean));
+});
+
+test('a conversa individual tem exatamente quatro perguntas', () => {
+  assert.equal(perguntasDaConversa(resultadoDeExemplo()).length, 4);
+  assert.equal(perguntasDaConversa(resultadoDeExemplo({ a2: null })).length, 4);
+  assert.ok(perguntasDaConversa(resultadoDeExemplo({ a2: null })).every(Boolean));
+});
+
+test('o quadro de conflito aparece na parte 1', () => {
+  const html = montarRelatorio(resultadoDeExemplo());
+  assert.ok(html.slice(html.indexOf('id="parte1"'), html.indexOf('class="quebra-pagina"')).includes('class="grafico quadro"'));
+});
+
+test('o resumo traz perfil, motivadores, conflito e emocao', () => {
+  const r = resultadoDeExemplo();
+  const html = montarRelatorio(r);
+  const resumo = html.slice(html.indexOf('id="resumo"'), html.indexOf('id="parte1"'));
+  assert.ok(resumo.includes(r.perfil.titulo));
+  assert.ok(resumo.includes(NOMES_ESTILO[r.conflito.principal]));
+  assert.ok(resumo.includes(NOMES_DOMINIO[r.emocoes.forte]));
+});
+
+test('o retrato usado e o da combinacao de dominante e apoio', () => {
+  const r = resultadoDeExemplo({
+    a1: Array.from({ length: 12 }, (_, i) => (i < 7 ? { mais: 'E', menos: 'P' } : { mais: 'A', menos: 'P' })),
+  });
+  assert.equal(r.perfil.dominante, 'E');
+  assert.equal(r.perfil.apoio, 'A');
+  const html = montarRelatorio(r);
+  assert.ok(html.includes('Você decide rápido, mas não no escuro.'));
 });
 
 test('o botao de salvar em pdf aparece uma unica vez, no fim da pagina', () => {
