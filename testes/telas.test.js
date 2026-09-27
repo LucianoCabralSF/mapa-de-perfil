@@ -184,3 +184,70 @@ test('reabrir uma tela de duas frases com uma respondida nao avanca sozinho', as
   assert.equal(JSON.parse(guardado.get(CHAVE)).posicao, pos, 'continua na mesma tela');
   assert.match(raiz.innerHTML, /data-valor="4"[^>]*aria-pressed="true"|aria-pressed="true"[^>]*data-valor="4"/);
 });
+
+function navegarComCliques(posicao) {
+  return import('../src/telas.js').then(({ criarNavegacao }) => {
+    const guardado = new Map();
+    globalThis.sessionStorage = {
+      getItem: (k) => (guardado.has(k) ? guardado.get(k) : null),
+      setItem: (k, v) => { guardado.set(k, String(v)); },
+      removeItem: (k) => { guardado.delete(k); },
+    };
+    globalThis.window = { scrollTo() {}, confirm: () => true };
+    guardado.set(CHAVE, JSON.stringify(sessaoDeExemplo({ posicao })));
+    let aoClicar = null;
+    const raiz = {
+      innerHTML: '', addEventListener: (_, fn) => { aoClicar = fn; },
+      querySelector: () => null, querySelectorAll: () => [],
+    };
+    criarNavegacao(raiz).iniciar();
+    const clicar = (dataset) => aoClicar({ target: { closest: () => ({ dataset }) } });
+    const posicaoAtual = () => JSON.parse(guardado.get(CHAVE)).posicao;
+    return { clicar, posicaoAtual };
+  });
+}
+
+const esperar = (ms) => new Promise((ok) => setTimeout(ok, ms));
+
+test('corrigir rapido uma resposta numa tela de frases avanca uma unica tela', async () => {
+  const telas = montarSequencia();
+  const pos = telas.findIndex((t) => t.tipo === 'multipla' && t.itens[0].campo === 'emocoes');
+  const { clicar, posicaoAtual } = await navegarComCliques(pos);
+  const [i0, i1] = telas[pos].itens.map((i) => String(i.indice));
+  clicar({ acao: 'multipla', campo: 'emocoes', indice: i0, valor: '3' });
+  clicar({ acao: 'multipla', campo: 'emocoes', indice: i1, valor: '3' });
+  clicar({ acao: 'multipla', campo: 'emocoes', indice: i1, valor: '4' });
+  await esperar(400);
+  assert.equal(posicaoAtual(), pos + 1);
+});
+
+test('toque duplo no segundo passo da escolha forcada avanca uma unica tela', async () => {
+  const telas = montarSequencia();
+  const pos = telas.findIndex((t) => t.tipo === 'forcada');
+  const { clicar, posicaoAtual } = await navegarComCliques(pos);
+  clicar({ acao: 'forcada', codigo: 'E' });
+  clicar({ acao: 'forcada', codigo: 'A' });
+  clicar({ acao: 'forcada', codigo: 'A' });
+  await esperar(400);
+  assert.equal(posicaoAtual(), pos + 1);
+});
+
+test('toque duplo num par avanca uma unica tela', async () => {
+  const telas = montarSequencia();
+  const pos = telas.findIndex((t) => t.tipo === 'par');
+  const { clicar, posicaoAtual } = await navegarComCliques(pos);
+  clicar({ acao: 'par', codigo: telas[pos].esquerda.codigo });
+  clicar({ acao: 'par', codigo: telas[pos].esquerda.codigo });
+  await esperar(400);
+  assert.equal(posicaoAtual(), pos + 1);
+});
+
+test('voltar logo depois de completar uma tela nao e desfeito pelo avanco agendado', async () => {
+  const telas = montarSequencia();
+  const pos = telas.findIndex((t) => t.tipo === 'par');
+  const { clicar, posicaoAtual } = await navegarComCliques(pos);
+  clicar({ acao: 'par', codigo: telas[pos].direita.codigo });
+  clicar({ acao: 'voltar' });
+  await esperar(400);
+  assert.equal(posicaoAtual(), pos - 1);
+});

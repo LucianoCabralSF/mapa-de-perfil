@@ -230,6 +230,9 @@ export function criarNavegacao(raiz) {
   let passo = 'mais';
   let respostas = estadoInicial();
   let ultimoResultado = null;
+  // Um unico avanco agendado por vez: toque duplo ou correcao rapida nunca
+  // pula a tela seguinte, e "voltar" cancela o avanco que ainda nao aconteceu.
+  let avancoPendente = null;
   const compartilharPerfil = criarCompartilhador({
     navegador: navigator,
     abrir: (url) => window.open(url, '_blank', 'noopener'),
@@ -260,6 +263,19 @@ export function criarNavegacao(raiz) {
     posicao = salvo.posicao;
   }
 
+  function agendarAvanco() {
+    clearTimeout(avancoPendente);
+    avancoPendente = setTimeout(() => {
+      avancoPendente = null;
+      avancar();
+    }, ATRASO_AVANCO);
+  }
+
+  function cancelarAvanco() {
+    clearTimeout(avancoPendente);
+    avancoPendente = null;
+  }
+
   function avancar() {
     posicao = Math.min(posicao + 1, telas.length - 1);
     passo = 'mais';
@@ -268,6 +284,7 @@ export function criarNavegacao(raiz) {
   }
 
   function voltarTela() {
+    cancelarAvanco();
     posicao = Math.max(posicao - 1, 0);
     passo = 'mais';
     guardar();
@@ -389,6 +406,7 @@ export function criarNavegacao(raiz) {
   // ----- Acoes -----
 
   function responderForcada(codigo) {
+    if (avancoPendente) return;
     const tela = telas[posicao];
     const resposta = respostas[tela.campo][tela.indiceResposta];
 
@@ -404,15 +422,16 @@ export function criarNavegacao(raiz) {
     resposta.menos = codigo;
     guardar();
     marcarEsperando(codigo);
-    setTimeout(avancar, ATRASO_AVANCO);
+    agendarAvanco();
   }
 
   function responderPar(codigo) {
+    if (avancoPendente) return;
     const tela = telas[posicao];
     respostas.b[tela.indice] = codigo;
     guardar();
     marcarEsperando(codigo);
-    setTimeout(avancar, ATRASO_AVANCO);
+    agendarAvanco();
   }
 
   // Marca a resposta sem redesenhar (a tela nao volta ao topo) e avanca
@@ -428,7 +447,7 @@ export function criarNavegacao(raiz) {
       b.setAttribute('aria-pressed', String(marcado));
     });
     const completa = tela.itens.every((i) => respostas[i.campo][i.indice] !== null);
-    if (completa) setTimeout(avancar, ATRASO_AVANCO);
+    if (completa) agendarAvanco();
   }
 
   function marcarEsperando(valor) {
@@ -449,6 +468,7 @@ export function criarNavegacao(raiz) {
   }
 
   function voltarForcada() {
+    cancelarAvanco();
     if (passo === 'menos') {
       const tela = telas[posicao];
       respostas[tela.campo][tela.indiceResposta] = { mais: null, menos: null };
@@ -473,6 +493,7 @@ export function criarNavegacao(raiz) {
 
   function refazer() {
     if (!window.confirm('Apagar este resultado e começar o teste de novo?')) return;
+    cancelarAvanco();
     respostas = estadoInicial();
     ultimoResultado = null;
     posicao = 0;
