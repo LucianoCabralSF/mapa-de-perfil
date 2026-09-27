@@ -377,3 +377,13 @@ test('link com codigo malicioso no nome e no cargo aparece como texto', async ()
   assert.ok(!raiz.innerHTML.includes('<img'), 'nenhuma tag vinda do link entra na pagina');
   assert.ok(raiz.innerHTML.includes('&lt;img src=x onerror=alert(1)&gt;'));
 });
+
+test('a abertura explica a base do metodo entre o botao Comecar e o link do metodo', () => {
+  const html = htmlAbertura({ interno: null });
+  const frase = 'Ele se apoia em modelos reconhecidos: DISC (Marston), conflito (Thomas-Kilmann), motivação (Schein; Deci e Ryan) e inteligência emocional (Goleman). As perguntas são próprias. Não é teste psicológico nem foi validado cientificamente: é uma ferramenta de autoconhecimento e conversa.';
+  const iBotao = html.indexOf('data-acao="comecar"');
+  const iFrase = html.indexOf(frase);
+  const iLink = html.indexOf('href="metodo.html"');
+  assert.ok(iFrase > -1, 'a frase precisa estar na abertura');
+  assert.ok(iBotao < iFrase && iFrase < iLink, 'ordem: botao, frase, link');
+});

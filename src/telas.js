@@ -218,6 +218,9 @@ export function htmlAbertura({ interno }) {
     + '<p class="aviso-abertura">Nada do que você responder é gravado em servidor. '
     + 'O resultado aparece aqui no seu aparelho e some quando você fechar esta aba.</p>'
     + '<button type="button" class="botao-principal" data-acao="comecar">Começar</button>'
+    + '<p class="nota-base">Ele se apoia em modelos reconhecidos: DISC (Marston), conflito (Thomas-Kilmann), '
+    + 'motivação (Schein; Deci e Ryan) e inteligência emocional (Goleman). As perguntas são próprias. '
+    + 'Não é teste psicológico nem foi validado cientificamente: é uma ferramenta de autoconhecimento e conversa.</p>'
     + '<a class="link-metodo" href="metodo.html">Conheça a base teórica do método →</a>'
     + '</div>';
 }
