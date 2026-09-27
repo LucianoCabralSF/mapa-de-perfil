@@ -68,3 +68,19 @@ test('a pagina do metodo tem previa propria', () => {
   assert.equal(m['og:url'], `${BASE}metodo.html`);
   assert.equal(m['og:image'], `${BASE}imagens/previa.png`);
 });
+
+test('o guia do facilitador tem as seis secoes', () => {
+  const html = ler('facilitador.html');
+  for (let i = 1; i <= 6; i += 1) assert.ok(html.includes(`id="g${i}"`), `falta a secao ${i}`);
+});
+
+test('o guia do facilitador nao aparece em buscador nem no site', () => {
+  assert.ok(ler('facilitador.html').includes('<meta name="robots" content="noindex, nofollow">'));
+  for (const arquivo of ['index.html', 'metodo.html']) {
+    assert.ok(!ler(arquivo).includes('facilitador.html'), `${arquivo} nao pode linkar o guia`);
+  }
+});
+
+test('o guia do facilitador usa linguagem neutra', () => {
+  assert.deepEqual(textoFlexionado(textoVisivel(ler('facilitador.html'))), []);
+});

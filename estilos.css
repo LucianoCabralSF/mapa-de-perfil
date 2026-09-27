@@ -433,10 +433,14 @@ p.destaque {
 .tabela-rolagem { overflow-x: auto; }
 .tabela-rolagem table { border-collapse: collapse; width: 100%; font-size: 14px; }
 .tabela-rolagem th, .tabela-rolagem td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--gold-soft); vertical-align: top; }
+.tabela-rolagem td:first-child { white-space: nowrap; }
 .tabela-rolagem th { color: var(--bronze); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; }
 .referencias { padding-left: 20px; font-size: 14px; color: var(--ink); }
 .referencias li { margin-bottom: 8px; }
 .link-metodo { display: block; text-align: center; margin: 14px 0 0; color: var(--navy); font-weight: 600; }
+.cartao-perfil { background: var(--sand); border: 1px solid var(--gold-soft); border-radius: 12px; padding: 14px 16px; margin: 0 0 12px; }
+.cartao-perfil h3 { color: var(--navy); margin: 0 0 6px; }
+.cartao-perfil p { margin: 0; }
 .rodape-pagina { border-top: 1px solid var(--gold-soft); margin-top: 24px; padding-top: 12px; font-size: 12px; letter-spacing: 1.5px; color: var(--bronze); }
 
 /* ---------- Acessibilidade ---------- */
@@ -454,6 +458,7 @@ p.destaque {
 /* ---------- Impressao ---------- */
 
 @media print {
+  .cartao-perfil, .pagina-texto section { break-inside: avoid; page-break-inside: avoid; }
   .voltar-link { display: none; }
   .sem-impressao { display: none !important; }
 
