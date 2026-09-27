@@ -172,10 +172,10 @@ export const MOTIVADOR_ALTO = {
 export const MOTIVADOR_BAIXO = {
   REA: 'Competir e superar marca não é o que te move. Ambiente que só fala de meta e ranking te deixa indiferente.',
   AUT: 'Liberdade total não é o que você busca. Ter alguém definindo o caminho te incomoda pouco, e às vezes até ajuda.',
-  SEG: 'Estabilidade não é o que te segura. Rotina previsível demais cansa você mais do que a incerteza.',
+  SEG: 'Estabilidade pesa menos para você do que os outros motivos. Um ambiente que só oferece previsibilidade dificilmente vai ser o que te mantém.',
   REC: 'Aplauso e visibilidade importam pouco para você. Cargo e título não são o que te fazem levantar da cama.',
-  PRO: 'Causa e propósito não são o centro da sua motivação. Você separa o trabalho do sentido de vida sem sofrer com isso.',
-  PER: 'Pertencer ao grupo pesa pouco na sua decisão. Você trabalha bem por conta própria e não sente falta do vínculo do time.',
+  PRO: 'Causa e propósito pesam menos para você do que os outros motivos. Um discurso de missão, por si só, dificilmente vai ser o que te engaja.',
+  PER: 'Pertencer ao grupo pesa menos para você do que os outros motivos. Integração e atividades de time, por si só, dificilmente vão ser o que te move.',
 };
 
 export const TEXTO_TENSAO = {

@@ -4,7 +4,7 @@
 
 export const LIDER_FRASE = {
   E: '{nome} rende mais com meta clara, prazo definido e liberdade para escolher o caminho. Diga aonde quer chegar e acompanhe pelo resultado, não pelo passo a passo.',
-  C: '{nome} rende mais quando pode falar, propor e trabalhar com gente. Dê espaço para as ideias e reconheça em público o que foi movimentado.',
+  C: '{nome} rende mais quando pode falar, propor e trabalhar com gente. Dê espaço para as ideias e reconheça em público o que {nome} fez acontecer.',
   P: '{nome} rende mais com previsibilidade, relação de confiança e tempo para fazer bem feito. Avise antes, explique o porquê e evite surpresas.',
   A: '{nome} rende mais com critério definido, informação confiável e tempo para conferir. Traga dados, combine o padrão de qualidade e respeite o tempo de análise.',
 };
@@ -48,7 +48,7 @@ export const LIDER_RETORNO = {
 
 export const LIDER_DELEGAR = {
   E: 'Delegue o resultado, não o método. Defina objetivo e prazo e combine poucos pontos de controle. {nome} rende mais com autonomia e se frustra com microgestão.',
-  C: 'Delegue tarefas com contato e visibilidade. Combine prazos por escrito e faça acompanhamentos curtos, para que o entusiasmo inicial de {nome} vire rotina de entrega.',
+  C: 'Delegue tarefas com contato e visibilidade. Combine prazos por escrito e faça acompanhamentos curtos, para transformar a energia de {nome} em entregas no prazo.',
   P: 'Delegue com contexto e tempo. Explique a tarefa por completo, deixe claro a quem recorrer e evite mudar a prioridade no meio. {nome} entrega com constância quando sabe o que esperar.',
   A: 'Delegue com critério definido e informação completa. Combine o nível de qualidade esperado e o prazo real: {nome} precisa saber quando o suficiente basta.',
 };
@@ -92,10 +92,10 @@ export const LIDER_DESGASTE_MOMENTO = '{nome} respondeu num momento de vida turb
 export const LIDER_EVITAR = {
   REA: 'Evite motivar {nome} só com metas, ranking e competição: isso pesa pouco e pode soar vazio.',
   AUT: 'Evite presumir que {nome} quer liberdade total: direção clara e acompanhamento próximo podem ser bem recebidos.',
-  SEG: 'Evite usar a estabilidade como argumento principal: previsibilidade demais pode desanimar {nome}.',
+  SEG: 'Evite usar a estabilidade como argumento principal: para {nome}, isso pesa menos do que os outros motivos.',
   REC: 'Evite reconhecer {nome} só com exposição pública e título: visibilidade importa pouco nesse caso.',
-  PRO: 'Evite apelar para causa e propósito como única motivação: {nome} separa bem o trabalho do sentido de vida.',
-  PER: 'Evite forçar integração e atividades de grupo como principal incentivo: {nome} trabalha bem por conta própria.',
+  PRO: 'Evite apelar para causa e propósito como principal argumento: para {nome}, isso pesa menos do que os outros motivos.',
+  PER: 'Evite usar integração e atividades de grupo como principal incentivo: para {nome}, isso pesa menos do que os outros motivos.',
 };
 
 // Perguntas para a conversa individual, dirigidas a pessoa.
