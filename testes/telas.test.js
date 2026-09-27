@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { montarSequencia, CHAVE } from '../src/telas.js';
+import { montarSequencia, CHAVE, htmlAbertura } from '../src/telas.js';
 import { INCLUIR_ADAPTADO } from '../src/dados.js';
 
 const RESPOSTA = new Set(['forcada', 'par', 'escala']);
@@ -35,4 +35,12 @@ test('nenhum respiro promete mais tempo do que o anterior', () => {
     .filter((t) => t.tipo === 'respiro')
     .map((t) => Number(t.tempo.match(/(\d+)/)[1]));
   for (let i = 1; i < minutos.length; i += 1) assert.ok(minutos[i] < minutos[i - 1]);
+});
+
+test('a abertura so avisa quando esta dentro de aplicativo', () => {
+  assert.ok(!htmlAbertura({ interno: null }).includes('aviso-navegador'));
+  const aviso = htmlAbertura({ interno: 'WhatsApp' });
+  assert.ok(aviso.includes('aviso-navegador'));
+  assert.ok(aviso.includes('pelo WhatsApp'));
+  assert.ok(htmlAbertura({ interno: 'aplicativo' }).includes('dentro de um aplicativo'));
 });

@@ -5,6 +5,7 @@ import {
 import { calcularResultado, PARES_MOTIVACAO, BLOCOS_ADAPTADO } from './motor.js';
 import { montarRelatorio, escaparHtml } from './relatorio.js';
 import { compartilhar, textoCompartilhamento } from './compartilhar.js';
+import { navegadorInterno } from './ambiente.js';
 
 // v2: formato de respostas mudou (A2 com 6 blocos, motivacoes em pares).
 // Sessao salva na v1 simplesmente nao e lida.
@@ -103,10 +104,37 @@ export function montarSequencia() {
   return telas;
 }
 
+export function htmlAbertura({ interno }) {
+  const origem = interno === 'aplicativo' ? 'dentro de um aplicativo' : `pelo ${interno}`;
+  const aviso = interno
+    ? '<div class="aviso-navegador">'
+      + `<p><strong>Você abriu ${escaparHtml(origem)}.</strong> Para conseguir salvar seu resultado `
+      + 'em PDF no final, abra esta página no navegador antes de começar: toque em '
+      + '<strong>⋮</strong> ou <strong>…</strong> e escolha <strong>Abrir no navegador</strong>.</p>'
+      + '</div>'
+    : '';
+  return '<div class="tela">'
+    + '<p class="kicker">DEL / LÓTUS</p>'
+    + '<h1>Mapa de Perfil.</h1>'
+    + aviso
+    + '<p>Um retrato de como você age, do que te move e de quanto o seu momento de '
+    + 'vida está influenciando as duas coisas.</p>'
+    + '<p>São cerca de 10 minutos. Responda sem pensar muito: a primeira reação costuma '
+    + 'ser a mais verdadeira.</p>'
+    + '<p>Em várias telas você vai escolher entre palavras que talvez combinem todas com '
+    + 'você, ou nenhuma. Escolha a que <strong>mais</strong> e a que <strong>menos</strong> '
+    + 'se parece com você. A comparação é entre elas, não com o mundo.</p>'
+    + '<p class="aviso-abertura">Nada do que você responder é gravado em servidor. '
+    + 'O resultado aparece aqui no seu aparelho e some quando você fechar esta aba.</p>'
+    + '<button type="button" class="botao-principal" data-acao="comecar">Começar</button>'
+    + '</div>';
+}
+
 // ---------- Navegacao ----------
 
 export function criarNavegacao(raiz) {
   const telas = montarSequencia();
+  const interno = navegadorInterno(navigator.userAgent);
   let posicao = 0;
   let passo = 'mais';
   let respostas = estadoInicial();
@@ -164,23 +192,6 @@ export function criarNavegacao(raiz) {
   }
 
   // ----- Telas -----
-
-  function telaAbertura() {
-    return '<div class="tela">'
-      + '<p class="kicker">DEL / LÓTUS</p>'
-      + '<h1>Mapa de Perfil.</h1>'
-      + '<p>Um retrato de como você age, do que te move e de quanto o seu momento de '
-      + 'vida está influenciando as duas coisas.</p>'
-      + '<p>São cerca de 10 minutos. Responda sem pensar muito: a primeira reação costuma '
-      + 'ser a mais verdadeira.</p>'
-      + '<p>Em várias telas você vai escolher entre palavras que talvez combinem todas com '
-      + 'você, ou nenhuma. Escolha a que <strong>mais</strong> e a que <strong>menos</strong> '
-      + 'se parece com você. A comparação é entre elas, não com o mundo.</p>'
-      + '<p class="aviso-abertura">Nada do que você responder é gravado em servidor. '
-      + 'O resultado aparece aqui no seu aparelho e some quando você fechar esta aba.</p>'
-      + '<button type="button" class="botao-principal" data-acao="comecar">Começar</button>'
-      + '</div>';
-  }
 
   function telaIdentificacao() {
     return '<div class="tela">'
@@ -264,7 +275,7 @@ export function criarNavegacao(raiz) {
 
   function desenhar() {
     const tela = telas[posicao];
-    if (tela.tipo === 'abertura') raiz.innerHTML = telaAbertura();
+    if (tela.tipo === 'abertura') raiz.innerHTML = htmlAbertura({ interno });
     else if (tela.tipo === 'identificacao') raiz.innerHTML = telaIdentificacao();
     else if (tela.tipo === 'respiro') raiz.innerHTML = telaRespiro(tela);
     else if (tela.tipo === 'forcada') raiz.innerHTML = telaForcada(tela);
@@ -340,6 +351,17 @@ export function criarNavegacao(raiz) {
     voltarTela();
   }
 
+  function mostrarAvisoPdf(botao) {
+    if (raiz.querySelector('#aviso-pdf')) return;
+    botao.insertAdjacentHTML('beforebegin',
+      '<div class="aviso-navegador sem-impressao" id="aviso-pdf">'
+      + '<p>O navegador deste aplicativo costuma não salvar PDF. Para guardar seu resultado agora, '
+      + 'tire prints da tela. Da próxima vez, abra o link no Chrome ou no Safari antes de começar.</p>'
+      + '</div>');
+    botao.dataset.insistir = '1';
+    botao.textContent = 'Tentar salvar em PDF mesmo assim';
+  }
+
   function aoClicar(evento) {
     const alvo = evento.target.closest('[data-acao]');
     if (!alvo) return;
@@ -350,7 +372,10 @@ export function criarNavegacao(raiz) {
     else if (acao === 'forcada') responderForcada(alvo.dataset.fator);
     else if (acao === 'escala') responderEscala(Number(alvo.dataset.valor));
     else if (acao === 'par') responderPar(alvo.dataset.codigo);
-    else if (acao === 'imprimir') window.print();
+    else if (acao === 'imprimir') {
+      if (interno && !alvo.dataset.insistir) mostrarAvisoPdf(alvo);
+      else window.print();
+    }
     else if (acao === 'compartilhar' && ultimoResultado) {
       compartilhar(textoCompartilhamento(ultimoResultado), {
         navegador: navigator,

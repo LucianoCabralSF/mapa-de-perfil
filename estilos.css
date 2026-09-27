@@ -298,6 +298,17 @@ p { text-align: left; }
   margin-top: 16px;
 }
 
+.aviso-navegador {
+  background: var(--blue-pale);
+  border-left: 3px solid var(--gold);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 0 0 16px;
+  color: var(--ink);
+  font-size: 15px;
+}
+.aviso-navegador p { margin: 0; }
+
 /* ---------- Relatorio ---------- */
 
 .cabecalho-relatorio {
