@@ -1,9 +1,16 @@
 # Mapa de Perfil
 
-Um questionário de cerca de 10 minutos que a pessoa responde pelo celular e, ao
-terminar, recebe na hora um relatório com seu perfil comportamental, suas
-motivações e uma leitura de quanto o momento de vida dela pode estar
-influenciando esse retrato. O relatório pode ser salvo em PDF.
+Um questionário de cerca de 16 minutos, em seis etapas, que a pessoa responde
+pelo celular. Ao terminar, recebe na hora um relatório em duas partes:
+
+- **Para você:** perfil comportamental, estilo diante de conflito, motivações,
+  como lida com as emoções, momento de vida e um plano de desenvolvimento.
+- **Para quem lidera:** como se comunicar, reconhecer, delegar, conduzir
+  conflito, perceber desgaste e quatro perguntas prontas para a próxima
+  conversa individual.
+
+As duas partes estão no mesmo PDF. Quem decide entregar à liderança é a
+própria pessoa.
 
 **Nenhuma resposta é gravada em servidor.** Não existe banco de dados nem
 cadastro. Tudo acontece dentro do navegador de quem responde e some quando a
@@ -46,12 +53,12 @@ abrir no navegador antes de começar — é lá que o "Salvar em PDF" funciona.
 
 ## Como encurtar o teste
 
-O teste tem 4 etapas e leva cerca de 10 minutos. A etapa mais demorada é a
-segunda, em que as mesmas palavras aparecem de novo para medir a diferença
-entre como a pessoa é e como ela precisa ser no trabalho.
+O teste tem 6 etapas e leva cerca de 16 minutos. Uma delas é a segunda, em que
+seis situações aparecem de novo para medir a diferença entre como a pessoa é e
+como ela precisa ser no trabalho.
 
 Se o tempo da aula ficar curto, dá para desligar essa etapa. O teste cai para
-**3 etapas e cerca de 8 minutos**, e o relatório continua completo — só não terá
+**5 etapas e cerca de 14 minutos**, e o relatório continua completo — só não terá
 a seção "Natural × Adaptado".
 
 Abra o arquivo `src/dados.js`. Logo no começo está escrito:
@@ -101,7 +108,8 @@ todo texto está em linguagem neutra. Todos precisam passar.
 | `metodo.html` | A página da base teórica |
 | `facilitador.html` | O guia de quem conduz a aula |
 | `src/dados.js` | As perguntas do questionário e a chave para encurtar o teste |
-| `src/textos.js` | Todos os textos do relatório |
+| `src/textos.js` | Textos do resumo e da parte "Para você" |
+| `src/textos-lider.js` | Textos da parte "Para quem lidera" |
 | `src/motor.js` | As contas: pontuação, perfil, tensão, motivações, momento |
 | `src/graficos.js` | Os gráficos de barra |
 | `src/relatorio.js` | Monta o relatório final |
