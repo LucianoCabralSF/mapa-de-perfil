@@ -59,14 +59,11 @@ test('as duas ancoras sao textos diferentes', () => {
   assert.ok(ANCORA_A1.length > 10 && ANCORA_A2.length > 10);
 });
 
-test('a ordem de exibicao do A2 inverte blocos e opcoes sem perder nada', () => {
+test('a ordem de exibicao do A2 cobre os 6 blocos, invertida', () => {
   const ordem = ordemExibicaoA2();
-  assert.equal(ordem.length, 10);
-  assert.deepEqual(
-    [...ordem.map((p) => p.indiceCanonico)].sort((a, b) => a - b),
-    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-  );
-  assert.equal(ordem[0].indiceCanonico, 9);
+  assert.equal(ordem.length, 6);
+  assert.deepEqual(ordem.map((p) => p.posicao), [5, 4, 3, 2, 1, 0]);
+  assert.deepEqual(ordem.map((p) => p.indiceCanonico), [9, 7, 6, 5, 3, 1]);
   assert.deepEqual(ordem[0].opcoes.map((o) => o.fator), ['A', 'P', 'C', 'E']);
 });
 

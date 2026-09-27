@@ -2,7 +2,7 @@ import {
   BLOCOS, AFIRMACOES, PERGUNTAS_MOMENTO, ESCALA_CONCORDANCIA,
   ANCORA_A1, ANCORA_A2, ordemExibicaoA2, INCLUIR_ADAPTADO,
 } from './dados.js';
-import { calcularResultado } from './motor.js';
+import { calcularResultado, BLOCOS_ADAPTADO } from './motor.js';
 import { montarRelatorio, escaparHtml } from './relatorio.js';
 
 const CHAVE = 'mapa-de-perfil-v1';
@@ -47,7 +47,7 @@ function montarSequencia() {
 
   BLOCOS.forEach((opcoes, indice) => {
     telas.push({
-      tipo: 'forcada', campo: 'a1', indiceCanonico: indice, opcoes, ancora: ANCORA_A1, etapa, etapas,
+      tipo: 'forcada', campo: 'a1', indiceResposta: indice, opcoes, ancora: ANCORA_A1, etapa, etapas,
     });
   });
 
@@ -63,7 +63,7 @@ function montarSequencia() {
       telas.push({
         tipo: 'forcada',
         campo: 'a2',
-        indiceCanonico: item.indiceCanonico,
+        indiceResposta: item.posicao,
         opcoes: item.opcoes,
         ancora: ANCORA_A2,
         etapa,
@@ -111,7 +111,7 @@ export function criarNavegacao(raiz) {
       nome: '',
       contexto: '',
       a1: BLOCOS.map(() => ({ mais: null, menos: null })),
-      a2: INCLUIR_ADAPTADO ? BLOCOS.map(() => ({ mais: null, menos: null })) : null,
+      a2: INCLUIR_ADAPTADO ? BLOCOS_ADAPTADO.map(() => ({ mais: null, menos: null })) : null,
       b: AFIRMACOES.map(() => null),
       c: PERGUNTAS_MOMENTO.map(() => null),
     };
@@ -199,7 +199,7 @@ export function criarNavegacao(raiz) {
   }
 
   function telaForcada(tela) {
-    const resposta = respostas[tela.campo][tela.indiceCanonico];
+    const resposta = respostas[tela.campo][tela.indiceResposta];
     const pergunta = passo === 'mais'
       ? 'Qual MAIS combina com você?'
       : 'E qual MENOS combina com você?';
@@ -255,7 +255,7 @@ export function criarNavegacao(raiz) {
 
   function responderForcada(fator) {
     const tela = telas[posicao];
-    const resposta = respostas[tela.campo][tela.indiceCanonico];
+    const resposta = respostas[tela.campo][tela.indiceResposta];
 
     if (passo === 'mais') {
       resposta.mais = fator;
@@ -300,7 +300,7 @@ export function criarNavegacao(raiz) {
   function voltarForcada() {
     if (passo === 'menos') {
       const tela = telas[posicao];
-      respostas[tela.campo][tela.indiceCanonico] = { mais: null, menos: null };
+      respostas[tela.campo][tela.indiceResposta] = { mais: null, menos: null };
       passo = 'mais';
       guardar();
       desenhar();

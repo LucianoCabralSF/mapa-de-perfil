@@ -13,6 +13,7 @@ import {
   pontuarMomento,
   DIRECOES_MOMENTO,
   calcularResultado,
+  BLOCOS_ADAPTADO,
 } from '../src/motor.js';
 
 test('FATORES esta na ordem canonica', () => {
@@ -202,7 +203,7 @@ function respostasDeExemplo(extras = {}) {
     nome: 'Maria',
     contexto: '',
     a1: Array.from({ length: 10 }, () => ({ mais: 'E', menos: 'A' })),
-    a2: Array.from({ length: 10 }, () => ({ mais: 'A', menos: 'E' })),
+    a2: Array.from({ length: 6 }, () => ({ mais: 'A', menos: 'E' })),
     b: MAPA_MOTIVACOES.map((c) => (c === 'PRO' ? 5 : 2)),
     c: [1, 1, 5, 5, 5],
     ...extras,
@@ -233,9 +234,37 @@ test('alerta reforcado exige momento turbulento e tensao alta juntos', () => {
   const soTurbulento = calcularResultado(
     respostasDeExemplo({
       c: [5, 5, 1, 1, 1],
-      a2: Array.from({ length: 10 }, () => ({ mais: 'E', menos: 'A' })),
+      a2: Array.from({ length: 6 }, () => ({ mais: 'E', menos: 'A' })),
     }),
   );
   assert.equal(soTurbulento.tensao.faixa, 'baixa');
   assert.equal(soTurbulento.alertaReforcado, false);
+});
+
+test('seis respostas iguais tambem levam o fator ao extremo', () => {
+  const respostas = Array.from({ length: 6 }, () => ({ mais: 'E', menos: 'P' }));
+  const { brutos, pct } = pontuarComportamento(respostas);
+  assert.equal(brutos.E, 6);
+  assert.equal(pct.E, 100);
+  assert.equal(pct.P, 0);
+  assert.equal(pct.C, 50);
+});
+
+test('sem nenhum bloco todos os fatores ficam na linha de base', () => {
+  assert.deepEqual(pontuarComportamento([]).pct, { E: 50, C: 50, P: 50, A: 50 });
+});
+
+test('BLOCOS_ADAPTADO tem 6 indices canonicos distintos', () => {
+  assert.deepEqual(BLOCOS_ADAPTADO, [1, 3, 5, 6, 7, 9]);
+});
+
+test('a tensao compara o adaptado com os mesmos 6 blocos do natural', () => {
+  const a1 = Array.from({ length: 10 }, (_, i) => (
+    BLOCOS_ADAPTADO.includes(i) ? { mais: 'C', menos: 'A' } : { mais: 'E', menos: 'P' }
+  ));
+  const a2 = Array.from({ length: 6 }, () => ({ mais: 'C', menos: 'A' }));
+  const r = calcularResultado({ nome: 'X', contexto: '', a1, a2, b: [], c: [1, 1, 5, 5, 5] });
+  assert.equal(r.tensao.indice, 0, 'nos blocos comparados as respostas foram identicas');
+  assert.deepEqual(r.naturalComparavel.pct, r.adaptado.pct);
+  assert.equal(r.perfil.dominante, 'C', 'o perfil continua vindo dos 10 blocos do A1');
 });

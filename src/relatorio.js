@@ -115,8 +115,8 @@ export function montarRelatorio(resultado) {
   if (temAdaptado) {
     partes.push(cartao('comparacao', 'Natural × Adaptado',
       '<p class="legenda-grafico">Barra de cima: como você é. Barra de baixo: como você '
-      + 'precisa ser no trabalho hoje.</p>'
-      + barrasComparadas(natural.pct, adaptado.pct)
+      + 'precisa ser no trabalho hoje. A comparação usa os 6 blocos que você respondeu duas vezes.</p>'
+      + barrasComparadas(resultado.naturalComparavel.pct, adaptado.pct)
       + `<p class="indice-tensao">Índice de tensão: ${tensao.indice}</p>`
       + blocoTensao(tensao)));
   }

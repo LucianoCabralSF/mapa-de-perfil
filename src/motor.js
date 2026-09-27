@@ -11,11 +11,16 @@ export function pontuarComportamento(respostas) {
     if (resposta?.mais && brutos[resposta.mais] !== undefined) brutos[resposta.mais] += 1;
     if (resposta?.menos && brutos[resposta.menos] !== undefined) brutos[resposta.menos] -= 1;
   }
+  const n = respostas.length;
   const pct = Object.fromEntries(
-    FATORES.map((f) => [f, Math.round(((brutos[f] + 10) / 20) * 100)]),
+    FATORES.map((f) => [f, n ? Math.round(((brutos[f] + n) / (2 * n)) * 100) : 50]),
   );
   return { brutos, pct };
 }
+
+// Blocos que a pessoa responde tambem no bloco adaptado (A2).
+// A tensao compara o A2 com estes mesmos blocos do A1.
+export const BLOCOS_ADAPTADO = [1, 3, 5, 6, 7, 9];
 
 export const NOMES_FATOR = {
   E: 'Executor',
@@ -132,7 +137,10 @@ export function calcularResultado(respostas) {
   const natural = pontuarComportamento(respostas.a1);
   const perfil = definirPerfil(natural.brutos);
   const adaptado = respostas.a2 ? pontuarComportamento(respostas.a2) : null;
-  const tensao = adaptado ? calcularTensao(natural.pct, adaptado.pct) : null;
+  const naturalComparavel = adaptado
+    ? pontuarComportamento(BLOCOS_ADAPTADO.map((i) => respostas.a1[i]))
+    : null;
+  const tensao = adaptado ? calcularTensao(naturalComparavel.pct, adaptado.pct) : null;
   const motivacoes = pontuarMotivacoes(respostas.b);
   const momento = pontuarMomento(respostas.c);
   const alertaReforcado = Boolean(
@@ -146,6 +154,7 @@ export function calcularResultado(respostas) {
     natural,
     perfil,
     adaptado,
+    naturalComparavel,
     tensao,
     motivacoes,
     momento,

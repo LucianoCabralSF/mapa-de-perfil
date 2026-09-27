@@ -8,7 +8,7 @@ function resultadoDeExemplo(extras = {}) {
     nome: 'Maria',
     contexto: 'Analista de RH',
     a1: Array.from({ length: 10 }, () => ({ mais: 'E', menos: 'A' })),
-    a2: Array.from({ length: 10 }, () => ({ mais: 'A', menos: 'E' })),
+    a2: Array.from({ length: 6 }, () => ({ mais: 'A', menos: 'E' })),
     b: MAPA_MOTIVACOES.map((c) => (c === 'PRO' ? 5 : 2)),
     c: [5, 5, 1, 1, 1],
     ...extras,
@@ -76,4 +76,9 @@ test('alerta reforcado aparece quando as duas condicoes se somam', () => {
 test('o rodape legal esta sempre presente', () => {
   const html = montarRelatorio(resultadoDeExemplo({ a2: null, c: [1, 1, 5, 5, 5] }));
   assert.ok(/psicol[óo]gico/i.test(html));
+});
+
+test('a comparacao explica que usa os blocos respondidos duas vezes', () => {
+  const html = montarRelatorio(resultadoDeExemplo());
+  assert.ok(html.includes('6 blocos que você respondeu duas vezes'));
 });

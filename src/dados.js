@@ -1,5 +1,7 @@
+import { BLOCOS_ADAPTADO } from './motor.js';
+
 // Liga ou desliga o bloco de comportamento adaptado (A2).
-// Desligado: o teste cai de 37 para 27 telas e o relatorio omite
+// Desligado: o teste cai de 36 para 30 telas e o relatorio omite
 // a secao Natural x Adaptado.
 export const INCLUIR_ADAPTADO = true;
 
@@ -105,11 +107,15 @@ export const ESCALA_CONCORDANCIA = [
   { valor: 5, rotulo: 'Concordo totalmente' },
 ];
 
-// Ordem fixa de exibicao do bloco A2: blocos de tras para frente e
-// opcoes invertidas dentro de cada bloco. Nao e sorteio - o mesmo
-// conjunto de respostas sempre produz o mesmo resultado.
+// Ordem fixa de exibicao do bloco A2: os 6 blocos de BLOCOS_ADAPTADO,
+// de tras para frente, com as opcoes invertidas. Nao e sorteio.
+// `posicao` e o indice em respostas.a2; `indiceCanonico` e o bloco em BLOCOS.
 export function ordemExibicaoA2() {
-  return BLOCOS
-    .map((bloco, indice) => ({ indiceCanonico: indice, opcoes: [...bloco].reverse() }))
+  return BLOCOS_ADAPTADO
+    .map((indiceCanonico, posicao) => ({
+      posicao,
+      indiceCanonico,
+      opcoes: [...BLOCOS[indiceCanonico]].reverse(),
+    }))
     .reverse();
 }
