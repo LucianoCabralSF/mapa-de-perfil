@@ -334,9 +334,10 @@ export function criarNavegacao(raiz) {
     const passo2 = passo === 'menos';
     // A palavra que decide o passo (mais / menos) vira destaque em caixa alta.
     const destaque = (texto) => escaparHtml(texto).replace(/\b(mais|menos)\b/, (m) => `<strong>${m.toUpperCase()}</strong>`);
+    const instrucao = (texto) => `Das frases abaixo, escolha: ${destaque(texto.charAt(0).toLowerCase() + texto.slice(1))}`;
     const rotulo = passo2
-      ? `<p class="passo-destaque passo-menos"><span class="passo-num">Passo 2 de 2</span><span>${destaque(tela.rotuloMenos)}</span></p>`
-      : `<p class="passo-destaque passo-mais"><span class="passo-num">Passo 1 de 2</span><span>${destaque(tela.rotuloMais)}</span></p>`;
+      ? `<p class="passo-destaque passo-menos"><span class="passo-num">Passo 2 de 2</span><span>${instrucao(tela.rotuloMenos)}</span></p>`
+      : `<p class="passo-destaque passo-mais"><span class="passo-num">Passo 1 de 2</span><span>${instrucao(tela.rotuloMais)}</span></p>`;
     const opcoes = tela.opcoes.map((o) => {
       const marcada = passo2 && resposta.mais === o.codigo;
       return `<button type="button" class="${marcada ? 'opcao marcada bloqueada' : 'opcao'}" `

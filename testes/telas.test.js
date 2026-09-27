@@ -268,6 +268,8 @@ test('a tela de escolha destaca MAIS no passo 1 e MENOS no passo 2', async () =>
   const raiz = { innerHTML: '', addEventListener: (_, fn) => { aoClicar = fn; }, querySelector: () => null, querySelectorAll: () => [] };
   criarNavegacao(raiz).iniciar();
   assert.match(raiz.innerHTML, /class="passo-destaque passo-mais"[^>]*>[\s\S]*<strong>MAIS<\/strong>/);
+  assert.ok(raiz.innerHTML.includes('Das frases abaixo, escolha: a que <strong>MAIS</strong> combina com você'));
   aoClicar({ target: { closest: () => ({ dataset: { acao: 'forcada', codigo: 'E' } }) } });
   assert.match(raiz.innerHTML, /class="passo-destaque passo-menos"[^>]*>[\s\S]*<strong>MENOS<\/strong>/);
+  assert.ok(raiz.innerHTML.includes('Das frases abaixo, escolha: a que <strong>MENOS</strong> combina com você'));
 });
