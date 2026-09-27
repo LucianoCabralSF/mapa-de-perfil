@@ -3,12 +3,13 @@ import assert from 'node:assert/strict';
 import {
   FATORES,
   MOTIVADORES,
-  MAPA_MOTIVACOES,
+  PARES_MOTIVACAO,
   DIRECOES_MOMENTO,
 } from '../src/motor.js';
 import {
   BLOCOS,
-  AFIRMACOES,
+  FRASES_MOTIVACAO,
+  montarPares,
   PERGUNTAS_MOMENTO,
   ESCALA_CONCORDANCIA,
   ANCORA_A1,
@@ -16,6 +17,7 @@ import {
   ordemExibicaoA2,
   INCLUIR_ADAPTADO,
 } from '../src/dados.js';
+import { palavrasFlexionadas } from './apoio/linguagem.js';
 
 test('existem 10 blocos com 4 opcoes cada, uma por fator', () => {
   assert.equal(BLOCOS.length, 10);
@@ -37,12 +39,26 @@ test('nenhuma palavra se repete no instrumento inteiro', () => {
   assert.equal(new Set(todas).size, todas.length);
 });
 
-test('existem 12 afirmacoes alinhadas ao mapa de motivacoes', () => {
-  assert.equal(AFIRMACOES.length, MAPA_MOTIVACOES.length);
-  for (const afirmacao of AFIRMACOES) {
-    assert.equal(typeof afirmacao, 'string');
-    assert.ok(afirmacao.length > 20);
+test('cada motivador tem 5 frases distintas e neutras', () => {
+  for (const codigo of MOTIVADORES) {
+    assert.equal(FRASES_MOTIVACAO[codigo].length, 5, `${codigo} precisa de 5 frases`);
   }
+  const todas = MOTIVADORES.flatMap((c) => FRASES_MOTIVACAO[c]);
+  assert.equal(new Set(todas).size, 30);
+  for (const frase of todas) {
+    assert.ok(frase.length <= 60, `frase longa demais: ${frase}`);
+    assert.deepEqual(palavrasFlexionadas(frase), [], `frase no masculino: ${frase}`);
+  }
+});
+
+test('montarPares segue PARES_MOTIVACAO e usa cada frase uma unica vez', () => {
+  const pares = montarPares();
+  assert.equal(pares.length, 15);
+  pares.forEach((par, i) => {
+    assert.deepEqual([par.esquerda.codigo, par.direita.codigo], PARES_MOTIVACAO[i]);
+  });
+  const usadas = pares.flatMap((p) => [p.esquerda.frase, p.direita.frase]);
+  assert.equal(new Set(usadas).size, 30);
 });
 
 test('existem 5 perguntas de momento alinhadas as direcoes', () => {

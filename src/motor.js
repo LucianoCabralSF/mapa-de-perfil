@@ -87,27 +87,49 @@ export const NOMES_MOTIVADOR = {
   PER: 'Pertencimento',
 };
 
-export const MAPA_MOTIVACOES = [
-  'REA', 'AUT', 'SEG', 'REC', 'PRO', 'PER',
-  'AUT', 'REA', 'REC', 'SEG', 'PER', 'PRO',
+// Comparacao pareada: todos os 15 pares entre os 6 motivadores.
+// Ordem pelo metodo do circulo (pares seguidos nunca repetem motivador);
+// lados escolhidos para cada motivador ficar 2 ou 3 vezes a esquerda.
+export const PARES_MOTIVACAO = [
+  ['REA', 'PER'], ['AUT', 'PRO'], ['REC', 'SEG'],
+  ['PRO', 'REA'], ['PER', 'REC'], ['SEG', 'AUT'],
+  ['REA', 'REC'], ['PRO', 'SEG'], ['AUT', 'PER'],
+  ['SEG', 'REA'], ['REC', 'AUT'], ['PER', 'PRO'],
+  ['AUT', 'REA'], ['SEG', 'PER'], ['PRO', 'REC'],
 ];
 
-export function pontuarMotivacoes(respostas) {
-  const brutos = zerados(MOTIVADORES);
-  MAPA_MOTIVACOES.forEach((codigo, indice) => {
-    const nota = respostas[indice];
-    if (typeof nota === 'number') brutos[codigo] += nota;
+const CONFRONTOS_POR_MOTIVADOR = MOTIVADORES.length - 1;
+
+export function pontuarMotivacoes(escolhas) {
+  const vitorias = zerados(MOTIVADORES);
+  const venceu = new Set();
+  PARES_MOTIVACAO.forEach(([a, b], indice) => {
+    const escolha = escolhas[indice];
+    if (escolha !== a && escolha !== b) return;
+    vitorias[escolha] += 1;
+    venceu.add(`${escolha}>${escolha === a ? b : a}`);
   });
+
+  // Desempate: vitorias contra quem terminou com o mesmo numero de vitorias.
+  // Em empate circular todos ficam iguais e vale a ordem canonica.
+  const desempate = zerados(MOTIVADORES);
+  for (const m of MOTIVADORES) {
+    for (const outro of MOTIVADORES) {
+      if (m !== outro && vitorias[m] === vitorias[outro] && venceu.has(`${m}>${outro}`)) {
+        desempate[m] += 1;
+      }
+    }
+  }
+
   return MOTIVADORES
     .map((codigo) => ({
       codigo,
-      bruto: brutos[codigo],
-      pct: Math.round(((brutos[codigo] - 2) / 8) * 100),
+      bruto: vitorias[codigo],
+      pct: Math.round((vitorias[codigo] / CONFRONTOS_POR_MOTIVADOR) * 100),
     }))
-    .sort((a, b) => {
-      if (b.bruto !== a.bruto) return b.bruto - a.bruto;
-      return MOTIVADORES.indexOf(a.codigo) - MOTIVADORES.indexOf(b.codigo);
-    });
+    .sort((x, y) => (y.bruto - x.bruto)
+      || (desempate[y.codigo] - desempate[x.codigo])
+      || (MOTIVADORES.indexOf(x.codigo) - MOTIVADORES.indexOf(y.codigo)));
 }
 
 export const DIRECOES_MOMENTO = ['direta', 'direta', 'invertida', 'invertida', 'invertida'];

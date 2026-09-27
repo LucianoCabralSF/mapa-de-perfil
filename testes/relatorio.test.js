@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { calcularResultado, MAPA_MOTIVACOES } from '../src/motor.js';
+import { calcularResultado, PARES_MOTIVACAO } from '../src/motor.js';
 import { montarRelatorio, escaparHtml } from '../src/relatorio.js';
 
 function resultadoDeExemplo(extras = {}) {
@@ -9,7 +9,7 @@ function resultadoDeExemplo(extras = {}) {
     contexto: 'Analista de RH',
     a1: Array.from({ length: 10 }, () => ({ mais: 'E', menos: 'A' })),
     a2: Array.from({ length: 6 }, () => ({ mais: 'A', menos: 'E' })),
-    b: MAPA_MOTIVACOES.map((c) => (c === 'PRO' ? 5 : 2)),
+    b: PARES_MOTIVACAO.map(([a, b]) => (a === 'PRO' || b === 'PRO' ? 'PRO' : a)),
     c: [5, 5, 1, 1, 1],
     ...extras,
   });

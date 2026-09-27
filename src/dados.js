@@ -1,4 +1,4 @@
-import { BLOCOS_ADAPTADO } from './motor.js';
+import { BLOCOS_ADAPTADO, MOTIVADORES, PARES_MOTIVACAO } from './motor.js';
 
 // Liga ou desliga o bloco de comportamento adaptado (A2).
 // Desligado: o teste cai de 36 para 30 telas e o relatorio omite
@@ -73,22 +73,62 @@ export const BLOCOS = [
   ],
 ];
 
-// Ordem canonica alinhada a MAPA_MOTIVACOES em src/motor.js:
-// REA, AUT, SEG, REC, PRO, PER, AUT, REA, REC, SEG, PER, PRO
-export const AFIRMACOES = [
-  'Fico entediado quando não tenho um desafio difícil pela frente.',
-  'Prefiro liberdade para decidir como faço meu trabalho, mesmo correndo mais risco.',
-  'Prefiro um trabalho estável e previsível a um mais arriscado, mesmo ganhando menos.',
-  'Faz diferença para mim ser reconhecido publicamente pelo que entrego.',
-  'Preciso sentir que meu trabalho melhora a vida de alguém.',
-  'Trabalhar com pessoas de quem eu gosto vale mais do que o cargo que eu ocupo.',
-  'Me incomoda ter alguém me dizendo o passo a passo do que devo fazer.',
-  'Sinto prazer em bater metas e superar meu próprio desempenho.',
-  'Me importo com o cargo que ocupo e com o quanto as pessoas valorizam minha posição.',
-  'Fico desconfortável quando não sei o que vai acontecer nos próximos meses.',
-  'Faço questão de sentir que pertenço ao time, não que sou apenas mais um.',
-  'Trocaria um salário maior por um trabalho com mais sentido para mim.',
-];
+// Cinco frases por motivador; a k-esima aparicao do motivador nos pares
+// usa a k-esima frase. Todas neutras e com ate 60 caracteres.
+export const FRASES_MOTIVACAO = {
+  REA: [
+    'Ter uma meta difícil para bater',
+    'Superar o meu próprio desempenho',
+    'Enfrentar um desafio que ninguém resolveu',
+    'Ver meu progresso crescer mês a mês',
+    'Trabalhar com meta ousada',
+  ],
+  AUT: [
+    'Decidir por conta própria como fazer',
+    'Ter liberdade para organizar meu tempo',
+    'Trabalhar sem alguém conferindo cada passo',
+    'Escolher o caminho, mesmo com mais risco',
+    'Ter autonomia para mudar o plano',
+  ],
+  SEG: [
+    'Saber o que vem nos próximos meses',
+    'Ter um emprego estável',
+    'Contar com renda previsível',
+    'Trabalhar com regras que não mudam toda hora',
+    'Ter segurança antes de arriscar',
+  ],
+  REC: [
+    'Receber reconhecimento público pelo que entrego',
+    'Ter um cargo que as pessoas valorizam',
+    'Ter meu nome num resultado de destaque',
+    'Receber elogio de quem admiro',
+    'Crescer de posição na organização',
+  ],
+  PRO: [
+    'Sentir que meu trabalho melhora a vida de alguém',
+    'Trabalhar por uma causa em que acredito',
+    'Ver sentido no que faço todo dia',
+    'Deixar uma contribuição que dure',
+    'Ajudar a resolver um problema da comunidade',
+  ],
+  PER: [
+    'Trabalhar com pessoas de quem gosto',
+    'Sentir que faço parte do time',
+    'Ter colegas com quem posso contar',
+    'Conviver bem com a equipe',
+    'Estar numa equipe unida',
+  ],
+};
+
+export function montarPares() {
+  const usadas = Object.fromEntries(MOTIVADORES.map((c) => [c, 0]));
+  const lado = (codigo) => {
+    const frase = FRASES_MOTIVACAO[codigo][usadas[codigo]];
+    usadas[codigo] += 1;
+    return { codigo, frase };
+  };
+  return PARES_MOTIVACAO.map(([a, b]) => ({ esquerda: lado(a), direita: lado(b) }));
+}
 
 // Ordem canonica alinhada a DIRECOES_MOMENTO em src/motor.js.
 export const PERGUNTAS_MOMENTO = [
