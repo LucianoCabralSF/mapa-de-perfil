@@ -51,7 +51,7 @@ function creditoDel() {
     + '<p class="credito-contato">'
     + '<a href="mailto:diretoriaadmlotus@gmail.com">diretoriaadmlotus@gmail.com</a>'
     + '<span class="credito-separador"> · </span>'
-    + '<a href="tel:+5592993047898">(92) 99304-7898</a>'
+    + '<a href="https://wa.me/5592993047898?text=Ol%C3%A1!%20Fiz%20o%20Mapa%20de%20Perfil%20e%20quero%20saber%20mais%20sobre%20as%20ferramentas%20da%20DEL." target="_blank" rel="noopener">(92) 99304-7898</a>'
     + '</p></div>';
 }
 

@@ -99,3 +99,11 @@ test('o relatorio oferece fazer o teste de novo, fora do pdf', () => {
   const html = montarRelatorio(resultadoDeExemplo());
   assert.match(html, /class="[^"]*sem-impressao[^"]*"[^>]*data-acao="refazer"/);
 });
+
+test('o telefone do rodape abre conversa direta no whatsapp', () => {
+  const html = montarRelatorio(resultadoDeExemplo());
+  const rodape = html.slice(html.indexOf('credito-del'));
+  assert.match(rodape, /href="https:\/\/wa\.me\/5592993047898\?text=[^"]+"/);
+  assert.ok(!rodape.includes('href="tel:'), 'o numero nao deve mais abrir o discador');
+  assert.ok(rodape.includes('(92) 99304-7898'), 'o numero continua visivel, inclusive no pdf');
+});
