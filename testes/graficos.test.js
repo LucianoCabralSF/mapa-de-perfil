@@ -55,3 +55,31 @@ test('toda barra tem trilho de fundo, para valor zero nao parecer falha de desen
   );
   assert.equal([...motivacoes.matchAll(/class="trilho"/g)].length, 3);
 });
+
+import { barrasConflito, barrasEmocoes, quadroConflito } from '../src/graficos.js';
+
+test('barras de conflito trazem os cinco estilos', () => {
+  const svg = barrasConflito({ COL: 90, NEG: 60, COM: 40, CED: 50, EVI: 10 });
+  for (const n of ['Colaborar', 'Negociar', 'Competir', 'Ceder', 'Evitar']) assert.ok(svg.includes(n));
+});
+
+test('barras de emocoes respeitam a ordem do ranking', () => {
+  const svg = barrasEmocoes([{ codigo: 'EMP', pct: 90 }, { codigo: 'AUT', pct: 70 }, { codigo: 'REL', pct: 50 }, { codigo: 'CTR', pct: 20 }]);
+  assert.ok(svg.indexOf('Empatia') < svg.indexOf('Autocontrole'));
+});
+
+test('o quadro de conflito posiciona o ponto e inverte o eixo vertical', () => {
+  const svg = quadroConflito(100, 100);
+  const cx = Number(svg.match(/class="ponto"[^>]*cx="([\d.]+)"/)[1]);
+  const cy = Number(svg.match(/class="ponto"[^>]*cy="([\d.]+)"/)[1]);
+  const baixo = Number(quadroConflito(0, 0).match(/class="ponto"[^>]*cy="([\d.]+)"/)[1]);
+  assert.ok(cx > 150, 'assertividade alta fica a direita');
+  assert.ok(cy < baixo, 'cooperacao alta fica em cima');
+  for (const n of ['Assertividade', 'Cooperação', 'Colaborar', 'Evitar']) assert.ok(svg.includes(n));
+});
+
+test('o quadro apara valores fora de 0 a 100', () => {
+  const svg = quadroConflito(180, -30);
+  const cx = Number(svg.match(/class="ponto"[^>]*cx="([\d.]+)"/)[1]);
+  assert.ok(cx <= 280);
+});

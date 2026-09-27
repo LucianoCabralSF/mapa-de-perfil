@@ -454,6 +454,12 @@ p.destaque {
 .cartao-perfil p { margin: 0; }
 .rodape-pagina { border-top: 1px solid var(--gold-soft); margin-top: 24px; padding-top: 12px; font-size: 12px; letter-spacing: 1.5px; color: var(--bronze); }
 
+.quadro { max-width: 320px; margin: 12px auto; }
+.quadro .quadro-fundo { fill: var(--blue-pale); }
+.quadro .quadro-meio { stroke: var(--gold-soft); stroke-width: 1; }
+.quadro .rotulo-quadro { font-family: var(--fonte); font-size: 11px; fill: var(--muted); }
+.quadro .ponto { fill: var(--gold); stroke: var(--navy); stroke-width: 2; }
+
 /* ---------- Acessibilidade ---------- */
 
 @media (prefers-reduced-motion: reduce) {
