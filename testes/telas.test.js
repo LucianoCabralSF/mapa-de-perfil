@@ -273,3 +273,107 @@ test('a tela de escolha destaca MAIS no passo 1 e MENOS no passo 2', async () =>
   assert.match(raiz.innerHTML, /class="passo-destaque passo-menos"[^>]*>[\s\S]*<strong>MENOS<\/strong>/);
   assert.ok(raiz.innerHTML.includes('Das frases abaixo, escolha: a que <strong>MENOS</strong> combina com você'));
 });
+
+async function abrirComEndereco(hash, { sessao = null } = {}) {
+  const { criarNavegacao } = await import('../src/telas.js');
+  const guardado = new Map();
+  if (sessao) guardado.set(CHAVE, JSON.stringify(sessao));
+  globalThis.sessionStorage = {
+    getItem: (k) => (guardado.has(k) ? guardado.get(k) : null),
+    setItem: (k, v) => { guardado.set(k, String(v)); },
+    removeItem: (k) => { guardado.delete(k); },
+  };
+  const abertos = [];
+  globalThis.window = { scrollTo() {}, open: (u) => { abertos.push(u); } };
+  globalThis.location = { hash, pathname: '/mapa-de-perfil/' };
+  globalThis.history = { replaceState: (_, __, url) => { globalThis.location.hash = url.includes('#') ? url.slice(url.indexOf('#')) : ''; } };
+  let aoClicar = null;
+  const painel = { hidden: true };
+  const raiz = {
+    innerHTML: '', addEventListener: (_, fn) => { aoClicar = fn; },
+    querySelector: (sel) => (sel === '#painel-compartilhar' ? painel : null), querySelectorAll: () => [],
+  };
+  criarNavegacao(raiz).iniciar();
+  const clicar = (dataset) => aoClicar({ target: { closest: () => ({ dataset }) } });
+  return { raiz, clicar, abertos, painel, guardado };
+}
+
+const RESPOSTAS_LINK = {
+  nome: 'Bia', contexto: '',
+  a1: Array.from({ length: 12 }, () => ({ mais: 'C', menos: 'A' })),
+  a2: Array.from({ length: 6 }, () => ({ mais: 'C', menos: 'A' })),
+  conflito: Array.from({ length: 6 }, () => ({ mais: 'COL', menos: 'EVI' })),
+  b: Array.from({ length: 15 }, () => null),
+  emocoes: Array.from({ length: 16 }, () => 4),
+  c: [2, 2, 4, 4, 4],
+};
+
+test('link de resumo abre so o resumo, com o nome e a data do teste', async () => {
+  const { codificarResultado } = await import('../src/link.js');
+  const token = codificarResultado(RESPOSTAS_LINK, { data: '03/09/2026', modo: 'resumo' });
+  const { raiz } = await abrirComEndereco(`#r=${token}`);
+  assert.ok(raiz.innerHTML.includes('Resultado compartilhado por <strong>Bia</strong>'));
+  assert.ok(raiz.innerHTML.includes('03/09/2026'));
+  assert.ok(raiz.innerHTML.includes('id="resumo"'));
+  assert.ok(!raiz.innerHTML.includes('id="parte2"'));
+});
+
+test('link do relatorio completo abre tudo, sem compartilhar nem refazer', async () => {
+  const { codificarResultado } = await import('../src/link.js');
+  const token = codificarResultado(RESPOSTAS_LINK, { data: '03/09/2026', modo: 'completo' });
+  const { raiz } = await abrirComEndereco(`#r=${token}`);
+  assert.ok(raiz.innerHTML.includes('id="parte2"'));
+  assert.ok(!raiz.innerHTML.includes('data-acao="compartilhar"'));
+});
+
+test('link quebrado explica o problema e oferece fazer o teste', async () => {
+  const { raiz } = await abrirComEndereco('#r=quebrado');
+  assert.match(raiz.innerHTML, /link/i);
+  assert.ok(raiz.innerHTML.includes('data-acao="fazer-meu-teste"'));
+  assert.ok(!raiz.innerHTML.includes('id="resumo"'));
+});
+
+test('fazer o meu teste leva para a abertura e limpa o endereco', async () => {
+  const { codificarResultado } = await import('../src/link.js');
+  const token = codificarResultado(RESPOSTAS_LINK, { data: '03/09/2026', modo: 'resumo' });
+  const { raiz, clicar } = await abrirComEndereco(`#r=${token}`);
+  clicar({ acao: 'fazer-meu-teste' });
+  assert.ok(raiz.innerHTML.includes('data-acao="comecar"'));
+  assert.equal(globalThis.location.hash, '');
+});
+
+test('abrir um link recebido nao apaga o teste em andamento de quem recebeu', async () => {
+  const { codificarResultado } = await import('../src/link.js');
+  const token = codificarResultado(RESPOSTAS_LINK, { data: '03/09/2026', modo: 'resumo' });
+  const sessao = sessaoDeExemplo({ posicao: 7 });
+  const { guardado, clicar } = await abrirComEndereco(`#r=${token}`, { sessao });
+  assert.equal(JSON.parse(guardado.get(CHAVE)).posicao, 7);
+  clicar({ acao: 'fazer-meu-teste' });
+  assert.equal(JSON.parse(guardado.get(CHAVE)).posicao, 7, 'volta para onde a pessoa tinha parado');
+});
+
+test('compartilhar abre o painel e a escolha gera um link que abre o proprio resultado', async () => {
+  const { decodificarResultado } = await import('../src/link.js');
+  const telas = montarSequencia();
+  const sessao = sessaoDeExemplo({ posicao: telas.length - 1 });
+  const { clicar, abertos, painel } = await abrirComEndereco('', { sessao });
+  clicar({ acao: 'compartilhar' });
+  assert.equal(painel.hidden, false);
+  clicar({ acao: 'compartilhar-completo' });
+  await esperar(50);
+  assert.equal(abertos.length, 1);
+  const texto = decodeURIComponent(abertos[0].split('text=')[1]);
+  const token = texto.match(/#r=([A-Za-z0-9_-]+)/)[1];
+  const volta = decodificarResultado(token);
+  assert.equal(volta.modo, 'completo');
+  assert.deepEqual(volta.respostas, sessao.respostas);
+});
+
+test('link com codigo malicioso no nome e no cargo aparece como texto', async () => {
+  const { codificarResultado } = await import('../src/link.js');
+  const ataque = '<img src=x onerror=alert(1)>';
+  const token = codificarResultado({ ...RESPOSTAS_LINK, nome: ataque, contexto: ataque }, { data: '03/09/2026', modo: 'completo' });
+  const { raiz } = await abrirComEndereco(`#r=${token}`);
+  assert.ok(!raiz.innerHTML.includes('<img'), 'nenhuma tag vinda do link entra na pagina');
+  assert.ok(raiz.innerHTML.includes('&lt;img src=x onerror=alert(1)&gt;'));
+});

@@ -42,9 +42,26 @@ function botaoImprimir(posicao) {
     + ` data-posicao="${posicao}">Salvar em PDF</button>`;
 }
 
+// O botao abre um painel: a pessoa escolhe o que o link vai mostrar.
 function botaoCompartilhar() {
   return '<button type="button" class="botao-secundario sem-impressao" data-acao="compartilhar">'
-    + 'Compartilhar meu perfil</button>';
+    + 'Compartilhar meu resultado</button>'
+    + '<div class="painel-compartilhar sem-impressao" id="painel-compartilhar" hidden>'
+    + '<p class="painel-titulo">O que você quer compartilhar?</p>'
+    + '<button type="button" class="opcao-compartilhar" data-acao="compartilhar-resumo">'
+    + '<strong>Resumo para amigos</strong><span>Só a primeira página: perfil, motivadores, conflito e força emocional.</span></button>'
+    + '<button type="button" class="opcao-compartilhar" data-acao="compartilhar-completo">'
+    + '<strong>Relatório completo para minha liderança</strong><span>Tudo, incluindo a parte para quem lidera você.</span></button>'
+    + '<p class="painel-aviso">Quem abrir o link verá o que você escolher. Nada é gravado em servidor, '
+    + 'mas o link fica na conversa em que você mandar.</p>'
+    + '</div>';
+}
+
+function faixaCompartilhada(nome) {
+  return '<div class="faixa-compartilhada sem-impressao">'
+    + `<p>Resultado compartilhado por <strong>${nome}</strong>.</p>`
+    + '<button type="button" class="botao-secundario" data-acao="fazer-meu-teste">Fazer o meu teste</button>'
+    + '</div>';
 }
 
 function botaoRefazer() {
@@ -96,9 +113,9 @@ export function perguntasDaConversa(r) {
 
 // ---------- Resumo ----------
 
-function montarResumo(r) {
+function montarResumo(r, { comAlertas = true } = {}) {
   const [m1, m2] = r.motivacoes;
-  const alertas = [
+  const alertas = !comAlertas ? [] : [
     r.momento.faixa === 'turbulento' ? 'Momento turbulento: leia o resultado como fotografia de uma fase.' : '',
     r.tensao?.faixa === 'alta' ? 'Tensão alta entre o jeito natural e o que o trabalho pede hoje.' : '',
   ].filter(Boolean);
@@ -242,33 +259,50 @@ function montarParte2(r, nome) {
 
 // ---------- Relatorio completo ----------
 
-export function montarRelatorio(resultado) {
-  const nome = escaparHtml(resultado.nome);
+function cabecalhoDe(resultado) {
   const contexto = resultado.contexto
     ? `<p class="contexto">${escaparHtml(resultado.contexto)}</p>`
     : '';
-
-  const cabecalho = '<header class="cabecalho-relatorio">'
+  return '<header class="cabecalho-relatorio">'
     + '<p class="kicker">DEL / LÓTUS · MAPA DE PERFIL</p>'
-    + `<h1>${nome}</h1>`
+    + `<h1>${escaparHtml(resultado.nome)}</h1>`
     + contexto
     + `<p class="data">${escaparHtml(resultado.data)}</p>`
     + '</header>';
+}
 
-  const rodape = '<footer class="rodape-relatorio">'
-    + botaoImprimir('rodape')
-    + botaoCompartilhar()
-    + botaoRefazer()
+function rodapeDe({ acoesDeQuemRespondeu, comPdf }) {
+  return '<footer class="rodape-relatorio">'
+    + (comPdf ? botaoImprimir('rodape') : '')
+    + (acoesDeQuemRespondeu ? botaoCompartilhar() + botaoRefazer() : '')
     + creditoDel()
     + `<p class="aviso-legal">${escaparHtml(RODAPE_LEGAL)}</p>`
     + '<p class="aviso-legal">Base teórica do método: '
     + '<a href="metodo.html">lucianocabralsf.github.io/mapa-de-perfil/metodo.html</a></p>'
     + '</footer>';
+}
 
-  return cabecalho
+// `compartilhado`: aberto por link por outra pessoa. Sem compartilhar nem
+// refazer (o resultado nao e dela), com convite para fazer o proprio teste.
+export function montarRelatorio(resultado, { compartilhado = false } = {}) {
+  const nome = escaparHtml(resultado.nome);
+  return (compartilhado ? faixaCompartilhada(nome) : '')
+    + cabecalhoDe(resultado)
     + montarResumo(resultado)
     + montarParte1(resultado)
     + '<div class="quebra-pagina" aria-hidden="true"></div>'
     + montarParte2(resultado, nome)
-    + rodape;
+    + rodapeDe({ acoesDeQuemRespondeu: !compartilhado, comPdf: true });
+}
+
+// Resumo aberto por link: so a primeira pagina, sem os alertas de momento
+// e de tensao, que falam da fase de vida da pessoa.
+export function montarResumoCompartilhado(resultado) {
+  const nome = escaparHtml(resultado.nome);
+  return faixaCompartilhada(nome)
+    + cabecalhoDe(resultado)
+    + montarResumo(resultado, { comAlertas: false })
+    + '<p class="nota-resumo">Este é o resumo que a pessoa escolheu compartilhar. '
+    + 'O relatório completo fica com ela.</p>'
+    + rodapeDe({ acoesDeQuemRespondeu: false, comPdf: false });
 }

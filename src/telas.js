@@ -7,7 +7,8 @@ import {
   calcularResultado, PARES_MOTIVACAO, BLOCOS_ADAPTADO, FATORES, MOTIVADORES,
   ESTILOS_CONFLITO, MAPA_EMOCOES,
 } from './motor.js';
-import { montarRelatorio, escaparHtml } from './relatorio.js';
+import { montarRelatorio, montarResumoCompartilhado, escaparHtml } from './relatorio.js';
+import { decodificarResultado, linkDoResultado } from './link.js';
 import { criarCompartilhador, textoCompartilhamento } from './compartilhar.js';
 import { navegadorInterno } from './ambiente.js';
 
@@ -391,6 +392,24 @@ export function criarNavegacao(raiz) {
   // A sessao continua apontando para o relatorio: recarregar, ou voltar de
   // uma saida para compartilhar, mostra o resultado de novo. O sessionStorage
   // some sozinho quando a aba e fechada.
+  // Resultado aberto por link: montado aqui, a partir das respostas que vem
+  // depois do "#". Nao toca na sessao salva de quem recebeu o link.
+  function telaCompartilhada(recebido) {
+    if (!recebido) {
+      return '<div class="tela">'
+        + '<p class="kicker">DEL / LÓTUS</p>'
+        + '<h1>Este link de resultado não abriu.</h1>'
+        + '<p>O endereço chegou incompleto ou foi alterado. Peça para a pessoa enviar o link de novo, '
+        + 'copiando a mensagem inteira.</p>'
+        + '<button type="button" class="botao-principal" data-acao="fazer-meu-teste">Fazer o meu teste</button>'
+        + '</div>';
+    }
+    const resultado = { ...calcularResultado(recebido.respostas), data: recebido.data };
+    return recebido.modo === 'completo'
+      ? montarRelatorio(resultado, { compartilhado: true })
+      : montarResumoCompartilhado(resultado);
+  }
+
   function telaRelatorio() {
     ultimoResultado = calcularResultado(respostas);
     return montarRelatorio(ultimoResultado);
@@ -507,6 +526,27 @@ export function criarNavegacao(raiz) {
     desenhar();
   }
 
+  function alternarPainelCompartilhar() {
+    const painel = raiz.querySelector('#painel-compartilhar');
+    if (painel) painel.hidden = !painel.hidden;
+  }
+
+  function compartilharResultado(modo) {
+    if (!ultimoResultado) return;
+    const link = linkDoResultado(respostas, { data: ultimoResultado.data, modo });
+    compartilharPerfil(textoCompartilhamento(ultimoResultado, modo, link));
+  }
+
+  function fazerMeuTeste() {
+    try {
+      history.replaceState(null, '', location.pathname);
+    } catch {
+      location.hash = '';
+    }
+    retomar();
+    desenhar();
+  }
+
   function aoClicar(evento) {
     const alvo = evento.target.closest('[data-acao]');
     if (!alvo) return;
@@ -524,9 +564,10 @@ export function criarNavegacao(raiz) {
       else window.print();
     }
     else if (acao === 'refazer') refazer();
-    else if (acao === 'compartilhar' && ultimoResultado) {
-      compartilharPerfil(textoCompartilhamento(ultimoResultado));
-    }
+    else if (acao === 'compartilhar') alternarPainelCompartilhar();
+    else if (acao === 'compartilhar-resumo') compartilharResultado('resumo');
+    else if (acao === 'compartilhar-completo') compartilharResultado('completo');
+    else if (acao === 'fazer-meu-teste') fazerMeuTeste();
     else if (acao === 'voltar') {
       if (telas[posicao].tipo === 'forcada') voltarForcada();
       else voltarTela();
@@ -535,8 +576,14 @@ export function criarNavegacao(raiz) {
 
   return {
     iniciar() {
-      retomar();
       raiz.addEventListener('click', aoClicar);
+      const hash = globalThis.location?.hash ?? '';
+      if (hash.startsWith('#r=')) {
+        raiz.innerHTML = telaCompartilhada(decodificarResultado(hash.slice(3)));
+        window.scrollTo(0, 0);
+        return;
+      }
+      retomar();
       desenhar();
     },
   };

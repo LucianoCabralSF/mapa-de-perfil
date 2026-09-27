@@ -12,12 +12,21 @@ const resultado = calcularResultado({
   c: [1, 1, 5, 5, 5],
 });
 
-test('o resumo traz perfil, dois motivadores e o link, sem o nome', () => {
-  const texto = textoCompartilhamento(resultado);
+const LINK = `${URL_PUBLICA}#r=abc`;
+
+test('a mensagem do resumo traz perfil, dois motivadores e o link do resultado', () => {
+  const texto = textoCompartilhamento(resultado, 'resumo', LINK);
   assert.ok(texto.includes(resultado.perfil.titulo));
   assert.ok(texto.includes('Propósito'));
-  assert.ok(texto.includes(URL_PUBLICA));
-  assert.ok(!texto.includes('Maria'), 'o nome nunca vai no compartilhamento');
+  assert.ok(texto.includes(LINK));
+  assert.ok(!texto.includes('Maria'), 'o nome nao vai no texto da mensagem');
+});
+
+test('a mensagem do relatorio completo fala com a lideranca e traz o link', () => {
+  const texto = textoCompartilhamento(resultado, 'completo', LINK);
+  assert.ok(texto.includes(LINK));
+  assert.match(texto, /lidera/);
+  assert.ok(!texto.includes('Maria'));
 });
 
 test('o link do whatsapp codifica acento e simbolo', () => {

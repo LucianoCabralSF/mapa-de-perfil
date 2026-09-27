@@ -210,4 +210,4 @@ export const ALERTA_REFORCADO = 'Atenção especial: você está num momento tur
 
 export const FECHAMENTO_RESSALVA = 'Perfil comportamental não é sentença. Ele muda com fase de vida, com o time em que você está e com o que você viveu recentemente. Se refizer este mapeamento daqui a um ano, é provável que o resultado seja diferente — e isso não é erro do instrumento, é a vida acontecendo. A parte sobre emoções mostra a percepção que você tem de si, e não uma medida externa.';
 
-export const RODAPE_LEGAL = 'Este material é uma ferramenta de autoconhecimento e apoio à decisão. Não é um teste psicológico nem um diagnóstico clínico, e não substitui avaliação feita por profissional habilitado. Nenhuma resposta foi gravada em servidor: este resultado existe apenas neste aparelho.';
+export const RODAPE_LEGAL = 'Este material é uma ferramenta de autoconhecimento e apoio à decisão. Não é um teste psicológico nem um diagnóstico clínico, e não substitui avaliação feita por profissional habilitado. Nenhuma resposta foi gravada em servidor: o resultado existe só no aparelho de quem respondeu e nos links que a pessoa decidir compartilhar.';

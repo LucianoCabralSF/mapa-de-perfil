@@ -4,7 +4,7 @@ import {
   calcularResultado, PARES_MOTIVACAO, MAPA_EMOCOES, NOMES_ESTILO, NOMES_DOMINIO,
 } from '../src/motor.js';
 import {
-  montarRelatorio, escaparHtml, acoesDoPlano, perguntasDaConversa,
+  montarRelatorio, escaparHtml, acoesDoPlano, perguntasDaConversa, montarResumoCompartilhado,
 } from '../src/relatorio.js';
 
 function resultadoDeExemplo(extras = {}) {
@@ -181,4 +181,35 @@ test('o whatsapp do rodape e um botao com rotulo claro', () => {
   assert.ok(botao.includes('Falar com a DEL no WhatsApp'));
   assert.ok(botao.includes('(92) 99304-7898'));
   assert.ok(botao.includes('aria-hidden="true"'), 'o icone e decorativo');
+});
+
+test('compartilhar abre um painel com as duas opcoes e o aviso', () => {
+  const html = montarRelatorio(resultadoDeExemplo());
+  const painel = html.slice(html.indexOf('id="painel-compartilhar"'), html.indexOf('</div>', html.indexOf('id="painel-compartilhar"')));
+  assert.ok(html.includes('id="painel-compartilhar"') && /id="painel-compartilhar"[^>]*hidden/.test(html), 'painel comeca escondido');
+  assert.ok(painel.includes('data-acao="compartilhar-resumo"'));
+  assert.ok(painel.includes('data-acao="compartilhar-completo"'));
+  assert.match(painel, /fica na conversa/);
+});
+
+test('o relatorio aberto por link nao oferece compartilhar nem refazer', () => {
+  const html = montarRelatorio(resultadoDeExemplo({ nome: 'Ana <b>' }), { compartilhado: true });
+  assert.ok(!html.includes('data-acao="compartilhar"'));
+  assert.ok(!html.includes('data-acao="refazer"'));
+  assert.ok(html.includes('data-acao="imprimir"'), 'o lider pode salvar o pdf');
+  assert.ok(html.includes('Resultado compartilhado por <strong>Ana &lt;b&gt;</strong>'));
+  assert.ok(html.includes('data-acao="fazer-meu-teste"'));
+  assert.ok(html.includes('id="parte2"'));
+});
+
+test('o resumo aberto por link mostra so o resumo, sem alertas sensiveis', () => {
+  const r = resultadoDeExemplo({ c: [5, 5, 1, 1, 1] });
+  assert.equal(r.momento.faixa, 'turbulento');
+  const html = montarResumoCompartilhado(r);
+  assert.ok(html.includes('id="resumo"'));
+  assert.ok(html.includes(r.perfil.titulo));
+  assert.ok(!html.includes('id="parte1"') && !html.includes('id="parte2"'));
+  assert.ok(!html.includes('resumo-alertas'), 'momento e tensao nao vao para o resumo compartilhado');
+  assert.ok(html.includes('data-acao="fazer-meu-teste"'));
+  assert.ok(!html.includes('data-acao="compartilhar"') && !html.includes('data-acao="refazer"'));
 });

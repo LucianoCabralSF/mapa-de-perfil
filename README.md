@@ -46,6 +46,11 @@ Quando o link é mandado no WhatsApp, aparece uma prévia com a marca da DEL. Se
 a prévia vier antiga ou sem imagem, é o WhatsApp que guardou uma versão
 anterior; ela se atualiza sozinha depois de um tempo.
 
+No fim do relatório, o botão **Compartilhar meu resultado** gera um link que abre o
+resultado no celular de quem recebe. A pessoa escolhe entre mandar só o resumo
+(para amigos) ou o relatório completo (para a liderança). As respostas vão dentro
+do próprio link, depois do `#`, e nada é gravado em servidor.
+
 Quem abrir o link **dentro** do WhatsApp ou do Instagram recebe um aviso para
 abrir no navegador antes de começar — é lá que o "Salvar em PDF" funciona.
 
