@@ -39,9 +39,9 @@ function textoVisivel(html) {
   return html.replace(/<style[\s\S]*?<\/style>/g, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ');
 }
 
-test('a pagina do metodo tem as sete secoes e volta para o teste', () => {
+test('a pagina do metodo tem as nove secoes e volta para o teste', () => {
   const html = ler('metodo.html');
-  for (let i = 1; i <= 7; i += 1) assert.ok(html.includes(`id="s${i}"`), `falta a secao ${i}`);
+  for (let i = 1; i <= 9; i += 1) assert.ok(html.includes(`id="s${i}"`), `falta a secao ${i}`);
   assert.ok(html.includes('href="./"'), 'falta o caminho de volta');
   assert.ok(html.includes('estilos.css'));
 });
@@ -83,4 +83,17 @@ test('o guia do facilitador nao aparece em buscador nem no site', () => {
 
 test('o guia do facilitador usa linguagem neutra', () => {
   assert.deepEqual(textoFlexionado(textoVisivel(ler('facilitador.html'))), []);
+});
+
+test('a base teorica cobre conflito e emocoes', () => {
+  const texto = textoVisivel(ler('metodo.html'));
+  for (const autor of ['BLAKE', 'THOMAS', 'KILMANN', 'GOLEMAN', 'BOYATZIS']) assert.ok(texto.includes(autor), `falta ${autor}`);
+  assert.match(texto, /percep[çc][ãa]o que a pessoa tem de si|como a pessoa se percebe/i);
+  assert.match(texto, /n[ãa]o (é|são) reproduzid|itens pr[óo]prios/i);
+});
+
+test('o guia do facilitador fala da parte 2 e do tempo novo', () => {
+  const texto = textoVisivel(ler('facilitador.html'));
+  assert.match(texto, /parte 2/i);
+  assert.match(texto, /16 min|5–21 min/);
 });
