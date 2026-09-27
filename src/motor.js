@@ -20,7 +20,7 @@ export function pontuarComportamento(respostas) {
 
 // Blocos que a pessoa responde tambem no bloco adaptado (A2).
 // A tensao compara o A2 com estes mesmos blocos do A1.
-export const BLOCOS_ADAPTADO = [1, 3, 5, 6, 7, 9];
+export const BLOCOS_ADAPTADO = [1, 3, 5, 7, 9, 11];
 
 export const NOMES_FATOR = {
   E: 'Executor',
@@ -148,6 +148,92 @@ export function pontuarMomento(respostas) {
   return { bruto, pct, faixa };
 }
 
+export const ESTILOS_CONFLITO = ['COL', 'NEG', 'COM', 'CED', 'EVI'];
+
+export const NOMES_ESTILO = {
+  COL: 'Colaborar',
+  NEG: 'Negociar',
+  COM: 'Competir',
+  CED: 'Ceder',
+  EVI: 'Evitar',
+};
+
+// [assertividade, cooperacao] de cada estilo no modelo de Thomas e Kilmann.
+const EIXOS_ESTILO = {
+  COL: [1, 1], NEG: [0.5, 0.5], COM: [1, 0], CED: [0, 1], EVI: [0, 0],
+};
+
+export function pontuarConflito(respostas) {
+  const brutos = zerados(ESTILOS_CONFLITO);
+  for (const r of respostas) {
+    if (ESTILOS_CONFLITO.includes(r?.mais)) brutos[r.mais] += 1;
+    if (ESTILOS_CONFLITO.includes(r?.menos)) brutos[r.menos] -= 1;
+  }
+  const n = respostas.length;
+  const pct = Object.fromEntries(
+    ESTILOS_CONFLITO.map((e) => [e, n ? Math.round(((brutos[e] + n) / (2 * n)) * 100) : 50]),
+  );
+  const ordem = [...ESTILOS_CONFLITO].sort((a, b) => (brutos[b] - brutos[a])
+    || (ESTILOS_CONFLITO.indexOf(a) - ESTILOS_CONFLITO.indexOf(b)));
+  const soma = ESTILOS_CONFLITO.reduce((acc, e) => acc + pct[e], 0);
+  const eixo = (i) => (soma
+    ? Math.round((ESTILOS_CONFLITO.reduce((acc, e) => acc + EIXOS_ESTILO[e][i] * pct[e], 0) / soma) * 100)
+    : 50);
+  return {
+    brutos,
+    pct,
+    principal: ordem[0],
+    secundario: ordem[1],
+    assertividade: eixo(0),
+    cooperacao: eixo(1),
+  };
+}
+
+export const DOMINIOS_EMOCAO = ['AUT', 'CTR', 'EMP', 'REL'];
+
+export const NOMES_DOMINIO = {
+  AUT: 'Autoconsciência',
+  CTR: 'Autocontrole',
+  EMP: 'Empatia',
+  REL: 'Relacionamento',
+};
+
+// Frases intercaladas por dominio (duas por tela, de dominios diferentes);
+// a ultima de cada dominio (indices 12 a 15) e invertida.
+export const MAPA_EMOCOES = Array.from({ length: 16 }, (_, i) => ({
+  dominio: DOMINIOS_EMOCAO[i % 4],
+  invertida: i >= 12,
+}));
+
+const LIMIAR_EQUILIBRIO = 10;
+
+export function pontuarEmocoes(respostas) {
+  const soma = zerados(DOMINIOS_EMOCAO);
+  const conta = zerados(DOMINIOS_EMOCAO);
+  MAPA_EMOCOES.forEach(({ dominio, invertida }, i) => {
+    const nota = respostas[i];
+    if (!Number.isInteger(nota) || nota < 1 || nota > 5) return;
+    soma[dominio] += invertida ? 6 - nota : nota;
+    conta[dominio] += 1;
+  });
+  const porDominio = Object.fromEntries(DOMINIOS_EMOCAO.map((d) => {
+    const media = conta[d] ? soma[d] / conta[d] : 3;
+    return [d, { media, pct: Math.round(((media - 1) / 4) * 100) }];
+  }));
+  const ranking = DOMINIOS_EMOCAO
+    .map((codigo) => ({ codigo, pct: porDominio[codigo].pct }))
+    .sort((x, y) => (y.pct - x.pct)
+      || (DOMINIOS_EMOCAO.indexOf(x.codigo) - DOMINIOS_EMOCAO.indexOf(y.codigo)));
+  const equilibrado = ranking[0].pct - ranking[ranking.length - 1].pct < LIMIAR_EQUILIBRIO;
+  return {
+    porDominio,
+    ranking,
+    forte: ranking[0].codigo,
+    desenvolver: equilibrado ? null : ranking[ranking.length - 1].codigo,
+    equilibrado,
+  };
+}
+
 function dataDeHoje() {
   const agora = new Date();
   const dd = String(agora.getDate()).padStart(2, '0');
@@ -164,6 +250,8 @@ export function calcularResultado(respostas) {
     : null;
   const tensao = adaptado ? calcularTensao(naturalComparavel.pct, adaptado.pct) : null;
   const motivacoes = pontuarMotivacoes(respostas.b);
+  const conflito = pontuarConflito(respostas.conflito ?? []);
+  const emocoes = pontuarEmocoes(respostas.emocoes ?? []);
   const momento = pontuarMomento(respostas.c);
   const alertaReforcado = Boolean(
     tensao && tensao.faixa === 'alta' && momento.faixa === 'turbulento',
@@ -179,6 +267,8 @@ export function calcularResultado(respostas) {
     naturalComparavel,
     tensao,
     motivacoes,
+    conflito,
+    emocoes,
     momento,
     alertaReforcado,
   };

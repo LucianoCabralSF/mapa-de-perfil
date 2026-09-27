@@ -14,6 +14,13 @@ import {
   DIRECOES_MOMENTO,
   calcularResultado,
   BLOCOS_ADAPTADO,
+  ESTILOS_CONFLITO,
+  NOMES_ESTILO,
+  pontuarConflito,
+  DOMINIOS_EMOCAO,
+  NOMES_DOMINIO,
+  MAPA_EMOCOES,
+  pontuarEmocoes,
 } from '../src/motor.js';
 
 test('FATORES esta na ordem canonica', () => {
@@ -229,7 +236,7 @@ function respostasDeExemplo(extras = {}) {
   return {
     nome: 'Maria',
     contexto: '',
-    a1: Array.from({ length: 10 }, () => ({ mais: 'E', menos: 'A' })),
+    a1: Array.from({ length: 12 }, () => ({ mais: 'E', menos: 'A' })),
     a2: Array.from({ length: 6 }, () => ({ mais: 'A', menos: 'E' })),
     b: PARES_MOTIVACAO.map(([a, b]) => (a === 'PRO' || b === 'PRO' ? 'PRO' : a)),
     c: [1, 1, 5, 5, 5],
@@ -282,16 +289,125 @@ test('sem nenhum bloco todos os fatores ficam na linha de base', () => {
 });
 
 test('BLOCOS_ADAPTADO tem 6 indices canonicos distintos', () => {
-  assert.deepEqual(BLOCOS_ADAPTADO, [1, 3, 5, 6, 7, 9]);
+  assert.deepEqual(BLOCOS_ADAPTADO, [1, 3, 5, 7, 9, 11]);
 });
 
 test('a tensao compara o adaptado com os mesmos 6 blocos do natural', () => {
-  const a1 = Array.from({ length: 10 }, (_, i) => (
-    BLOCOS_ADAPTADO.includes(i) ? { mais: 'C', menos: 'A' } : { mais: 'E', menos: 'P' }
+  const a1 = Array.from({ length: 12 }, (_, i) => (
+    BLOCOS_ADAPTADO.includes(i) ? { mais: 'C', menos: 'A' } : { mais: 'E', menos: 'C' }
   ));
   const a2 = Array.from({ length: 6 }, () => ({ mais: 'C', menos: 'A' }));
   const r = calcularResultado({ nome: 'X', contexto: '', a1, a2, b: [], c: [1, 1, 5, 5, 5] });
   assert.equal(r.tensao.indice, 0, 'nos blocos comparados as respostas foram identicas');
   assert.deepEqual(r.naturalComparavel.pct, r.adaptado.pct);
-  assert.equal(r.perfil.dominante, 'C', 'o perfil continua vindo dos 10 blocos do A1');
+  assert.equal(r.perfil.dominante, 'E', 'o perfil vem das 12 situacoes do A1, nao so das 6 comparadas');
+});
+
+test('doze respostas iguais levam o fator ao extremo', () => {
+  const { pct } = pontuarComportamento(Array.from({ length: 12 }, () => ({ mais: 'A', menos: 'E' })));
+  assert.equal(pct.A, 100);
+  assert.equal(pct.E, 0);
+  assert.equal(pct.C, 50);
+});
+
+test('estilos de conflito na ordem canonica e com nome', () => {
+  assert.deepEqual(ESTILOS_CONFLITO, ['COL', 'NEG', 'COM', 'CED', 'EVI']);
+  assert.deepEqual(Object.keys(NOMES_ESTILO).sort(), [...ESTILOS_CONFLITO].sort());
+});
+
+test('conflito: colaborar sempre leva ao canto de cima a direita', () => {
+  const r = pontuarConflito(Array.from({ length: 6 }, () => ({ mais: 'COL', menos: 'EVI' })));
+  assert.equal(r.pct.COL, 100);
+  assert.equal(r.pct.EVI, 0);
+  assert.equal(r.principal, 'COL');
+  assert.equal(r.assertividade, 70);
+  assert.equal(r.cooperacao, 70);
+});
+
+test('conflito: competir sempre fica assertivo e pouco cooperativo', () => {
+  const r = pontuarConflito(Array.from({ length: 6 }, () => ({ mais: 'COM', menos: 'CED' })));
+  assert.equal(r.principal, 'COM');
+  assert.equal(r.assertividade, 70);
+  assert.equal(r.cooperacao, 30);
+});
+
+test('conflito sem respostas fica no centro e desempata pela ordem canonica', () => {
+  const r = pontuarConflito([]);
+  assert.equal(r.assertividade, 50);
+  assert.equal(r.cooperacao, 50);
+  assert.equal(r.principal, 'COL');
+  assert.equal(r.secundario, 'NEG');
+});
+
+test('conflito ignora estilo inexistente', () => {
+  const r = pontuarConflito([{ mais: 'XYZ', menos: null }]);
+  assert.ok(Object.values(r.brutos).every((b) => b === 0));
+});
+
+test('mapa de emocoes: 16 frases, 4 por dominio, uma invertida em cada', () => {
+  assert.equal(MAPA_EMOCOES.length, 16);
+  for (const d of DOMINIOS_EMOCAO) {
+    const doDominio = MAPA_EMOCOES.filter((m) => m.dominio === d);
+    assert.equal(doDominio.length, 4);
+    assert.equal(doDominio.filter((m) => m.invertida).length, 1);
+  }
+  for (let i = 0; i < 16; i += 2) {
+    assert.notEqual(MAPA_EMOCOES[i].dominio, MAPA_EMOCOES[i + 1].dominio, 'duas frases da mesma tela sao de dominios diferentes');
+  }
+  assert.deepEqual(Object.keys(NOMES_DOMINIO).sort(), [...DOMINIOS_EMOCAO].sort());
+});
+
+function emocoes(notaPorDominio) {
+  return MAPA_EMOCOES.map((m) => {
+    const nota = notaPorDominio[m.dominio];
+    return m.invertida ? 6 - nota : nota;
+  });
+}
+
+test('emocoes: item invertido conta ao contrario', () => {
+  const r = pontuarEmocoes(emocoes({ AUT: 5, CTR: 5, EMP: 5, REL: 5 }));
+  assert.ok(Object.values(r.porDominio).every((d) => d.pct === 100));
+});
+
+test('emocoes: dominio mais forte e dominio a desenvolver', () => {
+  const r = pontuarEmocoes(emocoes({ AUT: 5, CTR: 3, EMP: 4, REL: 1 }));
+  assert.equal(r.forte, 'AUT');
+  assert.equal(r.desenvolver, 'REL');
+  assert.equal(r.equilibrado, false);
+  assert.deepEqual(r.ranking.map((x) => x.codigo), ['AUT', 'EMP', 'CTR', 'REL']);
+});
+
+test('emocoes: diferenca menor que 10 pontos e perfil equilibrado', () => {
+  const r = pontuarEmocoes(emocoes({ AUT: 4, CTR: 4, EMP: 4, REL: 4 }));
+  assert.equal(r.equilibrado, true);
+  assert.equal(r.desenvolver, null);
+  assert.equal(r.forte, 'AUT', 'empate cai na ordem canonica');
+});
+
+test('emocoes: dominio sem resposta fica no meio da escala', () => {
+  const r = pontuarEmocoes([]);
+  assert.ok(Object.values(r.porDominio).every((d) => d.media === 3 && d.pct === 50));
+});
+
+test('emocoes: nota fora da escala e ignorada', () => {
+  const r = pontuarEmocoes(MAPA_EMOCOES.map(() => 9));
+  assert.ok(Object.values(r.porDominio).every((d) => d.pct === 50));
+});
+
+test('resultado completo traz conflito e emocoes', () => {
+  const r = calcularResultado({
+    nome: 'Ana', contexto: '',
+    a1: Array.from({ length: 12 }, () => ({ mais: 'E', menos: 'A' })),
+    a2: null,
+    conflito: Array.from({ length: 6 }, () => ({ mais: 'NEG', menos: 'COM' })),
+    b: [], emocoes: emocoes({ AUT: 2, CTR: 5, EMP: 3, REL: 3 }), c: [1, 1, 5, 5, 5],
+  });
+  assert.equal(r.conflito.principal, 'NEG');
+  assert.equal(r.emocoes.forte, 'CTR');
+});
+
+test('resultado sem conflito nem emocoes respondidos nao quebra', () => {
+  const r = calcularResultado({ nome: 'Ana', contexto: '', a1: [], a2: null, b: [], c: [] });
+  assert.equal(r.conflito.principal, 'COL');
+  assert.equal(r.emocoes.equilibrado, true);
 });
