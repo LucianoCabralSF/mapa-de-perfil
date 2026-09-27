@@ -5,3 +5,4 @@ Thumbs.db
 .playwright-mcp/
 *.png
 *.pdf
+!imagens/*.png
