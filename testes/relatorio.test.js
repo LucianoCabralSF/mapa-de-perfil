@@ -94,3 +94,8 @@ test('o rodape aponta a base teorica, tambem como texto para o pdf', () => {
   assert.ok(rodape.includes('href="metodo.html"'));
   assert.ok(rodape.includes('lucianocabralsf.github.io/mapa-de-perfil/metodo.html'));
 });
+
+test('o relatorio oferece fazer o teste de novo, fora do pdf', () => {
+  const html = montarRelatorio(resultadoDeExemplo());
+  assert.match(html, /class="[^"]*sem-impressao[^"]*"[^>]*data-acao="refazer"/);
+});

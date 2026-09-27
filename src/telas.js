@@ -36,14 +36,6 @@ function lerEstado() {
   }
 }
 
-function limparEstado() {
-  try {
-    sessionStorage.removeItem(CHAVE);
-  } catch {
-    /* nada a fazer */
-  }
-}
-
 // ---------- Conferencia da sessao salva ----------
 // A sessao salva so e retomada se tiver exatamente o formato que esta
 // versao do teste produz. Qualquer diferenca (site atualizado com a aba
@@ -303,8 +295,10 @@ export function criarNavegacao(raiz) {
       + '</div>';
   }
 
+  // A sessao continua apontando para o relatorio: recarregar, ou voltar de
+  // uma saida para compartilhar, mostra o resultado de novo. O sessionStorage
+  // some sozinho quando a aba e fechada.
   function telaRelatorio() {
-    limparEstado();
     ultimoResultado = calcularResultado(respostas);
     return montarRelatorio(ultimoResultado);
   }
@@ -398,6 +392,16 @@ export function criarNavegacao(raiz) {
     botao.textContent = 'Tentar salvar em PDF mesmo assim';
   }
 
+  function refazer() {
+    if (!window.confirm('Apagar este resultado e começar o teste de novo?')) return;
+    respostas = estadoInicial();
+    ultimoResultado = null;
+    posicao = 0;
+    passo = 'mais';
+    guardar();
+    desenhar();
+  }
+
   function aoClicar(evento) {
     const alvo = evento.target.closest('[data-acao]');
     if (!alvo) return;
@@ -412,6 +416,7 @@ export function criarNavegacao(raiz) {
       if (interno && !alvo.dataset.insistir) mostrarAvisoPdf(alvo);
       else window.print();
     }
+    else if (acao === 'refazer') refazer();
     else if (acao === 'compartilhar' && ultimoResultado) {
       compartilharPerfil(textoCompartilhamento(ultimoResultado));
     }

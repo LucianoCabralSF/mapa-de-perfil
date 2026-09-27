@@ -39,6 +39,11 @@ function botaoCompartilhar() {
     + 'Compartilhar meu perfil</button>';
 }
 
+function botaoRefazer() {
+  return '<button type="button" class="link-refazer sem-impressao" data-acao="refazer">'
+    + 'Fazer o teste de novo (apaga este resultado)</button>';
+}
+
 function creditoDel() {
   return '<div class="credito-del">'
     + '<p class="credito-titulo">Ferramenta desenvolvida pela DEL — Desenvolvimento Humano e Gerencial.</p>'
@@ -139,6 +144,7 @@ export function montarRelatorio(resultado) {
     '<footer class="rodape-relatorio">'
       + botaoImprimir('rodape')
       + botaoCompartilhar()
+      + botaoRefazer()
       + creditoDel()
       + `<p class="aviso-legal">${escaparHtml(RODAPE_LEGAL)}</p>`
       + '<p class="aviso-legal">Base teórica do método: '

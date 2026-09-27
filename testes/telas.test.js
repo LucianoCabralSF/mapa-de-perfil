@@ -103,3 +103,48 @@ test('sessao com posicao impossivel e descartada', () => {
   assert.equal(sessaoValida(sessaoDeExemplo({ posicao: -1 }), telas), false);
   assert.equal(sessaoValida(null, telas), false);
 });
+
+test('recarregar ou voltar ao relatorio mostra o relatorio de novo', async () => {
+  const { criarNavegacao } = await import('../src/telas.js');
+  const guardado = new Map();
+  globalThis.sessionStorage = {
+    getItem: (k) => (guardado.has(k) ? guardado.get(k) : null),
+    setItem: (k, v) => { guardado.set(k, String(v)); },
+    removeItem: (k) => { guardado.delete(k); },
+  };
+  globalThis.window = { scrollTo() {} };
+  const telas = montarSequencia();
+  const sessao = sessaoDeExemplo({ posicao: telas.length - 1 });
+  guardado.set(CHAVE, JSON.stringify(sessao));
+
+  const raiz = { innerHTML: '', addEventListener() {}, querySelector: () => null };
+  criarNavegacao(raiz).iniciar();
+
+  assert.ok(raiz.innerHTML.includes('rodape-relatorio'), 'o relatorio foi desenhado');
+  const depois = JSON.parse(guardado.get(CHAVE) ?? 'null');
+  assert.equal(depois?.posicao, telas.length - 1, 'a sessao continua apontando para o relatorio');
+});
+
+test('fazer de novo apaga a sessao e volta para a abertura', async () => {
+  const { criarNavegacao } = await import('../src/telas.js');
+  const guardado = new Map();
+  globalThis.sessionStorage = {
+    getItem: (k) => (guardado.has(k) ? guardado.get(k) : null),
+    setItem: (k, v) => { guardado.set(k, String(v)); },
+    removeItem: (k) => { guardado.delete(k); },
+  };
+  globalThis.window = { scrollTo() {}, confirm: () => true };
+  const telas = montarSequencia();
+  guardado.set(CHAVE, JSON.stringify(sessaoDeExemplo({ posicao: telas.length - 1 })));
+
+  let aoClicar = null;
+  const raiz = { innerHTML: '', addEventListener: (_, fn) => { aoClicar = fn; }, querySelector: () => null };
+  criarNavegacao(raiz).iniciar();
+  const botao = { dataset: { acao: 'refazer' } };
+  aoClicar({ target: { closest: () => botao } });
+
+  assert.ok(raiz.innerHTML.includes('data-acao="comecar"'), 'voltou para a abertura');
+  const depois = JSON.parse(guardado.get(CHAVE) ?? 'null');
+  assert.ok(!depois || depois.posicao === 0, 'a sessao do relatorio anterior foi descartada');
+  assert.ok(!depois || depois.respostas.nome === '', 'o nome anterior foi apagado');
+});
