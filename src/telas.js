@@ -4,7 +4,7 @@ import {
 } from './dados.js';
 import { calcularResultado, PARES_MOTIVACAO, BLOCOS_ADAPTADO } from './motor.js';
 import { montarRelatorio, escaparHtml } from './relatorio.js';
-import { compartilhar, textoCompartilhamento } from './compartilhar.js';
+import { criarCompartilhador, textoCompartilhamento } from './compartilhar.js';
 import { navegadorInterno } from './ambiente.js';
 
 // v2: formato de respostas mudou (A2 com 6 blocos, motivacoes em pares).
@@ -140,6 +140,10 @@ export function criarNavegacao(raiz) {
   let passo = 'mais';
   let respostas = estadoInicial();
   let ultimoResultado = null;
+  const compartilharPerfil = criarCompartilhador({
+    navegador: navigator,
+    abrir: (url) => window.open(url, '_blank', 'noopener'),
+  });
 
   function estadoInicial() {
     return {
@@ -378,10 +382,7 @@ export function criarNavegacao(raiz) {
       else window.print();
     }
     else if (acao === 'compartilhar' && ultimoResultado) {
-      compartilhar(textoCompartilhamento(ultimoResultado), {
-        navegador: navigator,
-        abrir: (url) => window.open(url, '_blank', 'noopener'),
-      });
+      compartilharPerfil(textoCompartilhamento(ultimoResultado));
     }
     else if (acao === 'voltar') {
       if (telas[posicao].tipo === 'forcada') voltarForcada();

@@ -21,9 +21,28 @@ export async function compartilhar(texto, { navegador, abrir }) {
       await navegador.share({ text: texto });
       return 'nativo';
     } catch (erro) {
-      if (erro?.name === 'AbortError') return 'cancelado';
+      // AbortError: a pessoa fechou a janela. InvalidStateError: ja existe
+      // uma janela aberta (toque duplo). Nos dois casos, nada mais acontece.
+      if (erro?.name === 'AbortError' || erro?.name === 'InvalidStateError') return 'cancelado';
     }
   }
   abrir(linkWhatsApp(texto));
   return 'whatsapp';
+}
+
+// Um toque por vez: enquanto a janela de compartilhar estiver aberta, novos
+// toques sao ignorados. Nenhuma falha escapa como erro solto.
+export function criarCompartilhador(deps) {
+  let emAndamento = false;
+  return async (texto) => {
+    if (emAndamento) return 'ignorado';
+    emAndamento = true;
+    try {
+      return await compartilhar(texto, deps);
+    } catch {
+      return 'falhou';
+    } finally {
+      emAndamento = false;
+    }
+  };
 }

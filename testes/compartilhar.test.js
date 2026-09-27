@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { calcularResultado, PARES_MOTIVACAO } from '../src/motor.js';
-import { textoCompartilhamento, linkWhatsApp, compartilhar, URL_PUBLICA } from '../src/compartilhar.js';
+import { textoCompartilhamento, linkWhatsApp, compartilhar, criarCompartilhador, URL_PUBLICA } from '../src/compartilhar.js';
 
 const resultado = calcularResultado({
   nome: 'Maria Secreta',
@@ -57,4 +57,36 @@ test('sem compartilhamento nativo, abre o whatsapp', async () => {
   const r = await compartilhar('oi', { navegador: {}, abrir: (u) => { aberto = u; } });
   assert.equal(r, 'whatsapp');
   assert.ok(aberto.includes('text=oi'));
+});
+
+test('segundo toque com a janela nativa ainda aberta nao abre o whatsapp', async () => {
+  let aberto = null;
+  const erro = Object.assign(new Error('pendente'), { name: 'InvalidStateError' });
+  const navegador = { share: async () => { throw erro; } };
+  const r = await compartilhar('oi', { navegador, abrir: (u) => { aberto = u; } });
+  assert.equal(r, 'cancelado');
+  assert.equal(aberto, null);
+});
+
+test('toques repetidos enquanto compartilha sao ignorados', async () => {
+  let chamadas = 0;
+  let aberto = null;
+  let liberar;
+  const navegador = { share: () => { chamadas += 1; return new Promise((ok) => { liberar = ok; }); } };
+  const tocar = criarCompartilhador({ navegador, abrir: (u) => { aberto = u; } });
+  const primeiro = tocar('oi');
+  const segundo = await tocar('oi');
+  assert.equal(segundo, 'ignorado');
+  liberar();
+  assert.equal(await primeiro, 'nativo');
+  assert.equal(chamadas, 1);
+  assert.equal(aberto, null);
+  navegador.share = async () => { chamadas += 1; };
+  assert.equal(await tocar('oi'), 'nativo', 'depois de terminar, aceita novo toque');
+  assert.equal(chamadas, 2);
+});
+
+test('falha ao abrir o whatsapp nao vira erro solto', async () => {
+  const tocar = criarCompartilhador({ navegador: {}, abrir: () => { throw new Error('bloqueado'); } });
+  assert.equal(await tocar('oi'), 'falhou');
 });
