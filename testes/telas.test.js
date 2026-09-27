@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { montarSequencia, CHAVE, htmlAbertura } from '../src/telas.js';
+import {
+  montarSequencia, CHAVE, htmlAbertura, sessaoValida, assinaturaSequencia,
+} from '../src/telas.js';
 import { INCLUIR_ADAPTADO } from '../src/dados.js';
 
 const RESPOSTA = new Set(['forcada', 'par', 'escala']);
@@ -47,4 +49,57 @@ test('a abertura so avisa quando esta dentro de aplicativo', () => {
 
 test('a abertura leva para a base teorica', () => {
   assert.ok(htmlAbertura({ interno: null }).includes('href="metodo.html"'));
+});
+
+function sessaoDeExemplo(extras = {}, respostasExtras = {}) {
+  const telas = montarSequencia();
+  return {
+    posicao: 5,
+    assinatura: assinaturaSequencia(telas),
+    respostas: {
+      nome: 'Ana',
+      contexto: '',
+      a1: Array.from({ length: 10 }, () => ({ mais: 'E', menos: null })),
+      a2: Array.from({ length: 6 }, () => ({ mais: null, menos: null })),
+      b: Array.from({ length: 15 }, () => null),
+      c: [3, null, null, null, null],
+      ...respostasExtras,
+    },
+    ...extras,
+  };
+}
+
+test('sessao salva no formato certo e aceita', () => {
+  assert.equal(sessaoValida(sessaoDeExemplo(), montarSequencia()), true);
+});
+
+test('sessao de outra configuracao do teste e descartada', () => {
+  const telas = montarSequencia();
+  assert.equal(sessaoValida(sessaoDeExemplo({ assinatura: undefined }), telas), false);
+  assert.equal(sessaoValida(sessaoDeExemplo({ assinatura: '30|sem-A2' }), telas), false);
+});
+
+test('sessao com respostas no formato errado e descartada', () => {
+  const telas = montarSequencia();
+  const casos = {
+    'a2 ausente com o adaptado ligado': { a2: null },
+    'bloco do a1 vazio': { a1: [null, ...Array.from({ length: 9 }, () => ({ mais: null, menos: null }))] },
+    'fator inexistente': { a1: Array.from({ length: 10 }, () => ({ mais: 'Z', menos: null })) },
+    'a1 curto': { a1: [] },
+    'b do formato antigo': { b: Array.from({ length: 12 }, () => 3) },
+    'b com codigo estranho': { b: Array.from({ length: 15 }, () => 'XYZ') },
+    'c fora da escala': { c: [7, null, null, null, null] },
+    'nome que nao e texto': { nome: 42 },
+  };
+  for (const [nome, respostas] of Object.entries(casos)) {
+    assert.equal(sessaoValida(sessaoDeExemplo({}, respostas), telas), false, nome);
+  }
+});
+
+test('sessao com posicao impossivel e descartada', () => {
+  const telas = montarSequencia();
+  assert.equal(sessaoValida(sessaoDeExemplo({ posicao: 999 }), telas), false);
+  assert.equal(sessaoValida(sessaoDeExemplo({ posicao: 1.5 }), telas), false);
+  assert.equal(sessaoValida(sessaoDeExemplo({ posicao: -1 }), telas), false);
+  assert.equal(sessaoValida(null, telas), false);
 });

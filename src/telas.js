@@ -2,7 +2,9 @@ import {
   BLOCOS, PERGUNTAS_MOMENTO, ESCALA_CONCORDANCIA,
   ANCORA_A1, ANCORA_A2, ordemExibicaoA2, montarPares, INCLUIR_ADAPTADO,
 } from './dados.js';
-import { calcularResultado, PARES_MOTIVACAO, BLOCOS_ADAPTADO } from './motor.js';
+import {
+  calcularResultado, PARES_MOTIVACAO, BLOCOS_ADAPTADO, FATORES, MOTIVADORES,
+} from './motor.js';
 import { montarRelatorio, escaparHtml } from './relatorio.js';
 import { criarCompartilhador, textoCompartilhamento } from './compartilhar.js';
 import { navegadorInterno } from './ambiente.js';
@@ -40,6 +42,36 @@ function limparEstado() {
   } catch {
     /* nada a fazer */
   }
+}
+
+// ---------- Conferencia da sessao salva ----------
+// A sessao salva so e retomada se tiver exatamente o formato que esta
+// versao do teste produz. Qualquer diferenca (site atualizado com a aba
+// aberta, INCLUIR_ADAPTADO trocado, dado corrompido) faz o teste recomecar.
+
+export function assinaturaSequencia(telas) {
+  return `${telas.length}|${INCLUIR_ADAPTADO ? 'A2' : 'sem-A2'}`;
+}
+
+function listaDe(valor, tamanho, itemValido) {
+  return Array.isArray(valor) && valor.length === tamanho && valor.every(itemValido);
+}
+
+function forcadaValida(r) {
+  const fatorOuVazio = (f) => f === null || FATORES.includes(f);
+  return Boolean(r) && typeof r === 'object' && fatorOuVazio(r.mais) && fatorOuVazio(r.menos);
+}
+
+export function sessaoValida(salvo, telas) {
+  if (!salvo || typeof salvo !== 'object') return false;
+  if (!Number.isInteger(salvo.posicao) || salvo.posicao < 0 || salvo.posicao >= telas.length) return false;
+  if (salvo.assinatura !== assinaturaSequencia(telas)) return false;
+  const r = salvo.respostas;
+  if (!r || typeof r.nome !== 'string' || typeof r.contexto !== 'string') return false;
+  if (!listaDe(r.a1, BLOCOS.length, forcadaValida)) return false;
+  if (INCLUIR_ADAPTADO ? !listaDe(r.a2, BLOCOS_ADAPTADO.length, forcadaValida) : r.a2 !== null) return false;
+  if (!listaDe(r.b, PARES_MOTIVACAO.length, (m) => m === null || MOTIVADORES.includes(m))) return false;
+  return listaDe(r.c, PERGUNTAS_MOMENTO.length, (n) => n === null || (Number.isInteger(n) && n >= 1 && n <= 5));
 }
 
 // ---------- Sequencia de telas ----------
@@ -157,14 +189,13 @@ export function criarNavegacao(raiz) {
   }
 
   function guardar() {
-    salvarEstado({ posicao, respostas });
+    salvarEstado({ posicao, respostas, assinatura: assinaturaSequencia(telas) });
   }
 
   function retomar() {
     const salvo = lerEstado();
-    if (!salvo || typeof salvo.posicao !== 'number' || !salvo.respostas) return;
-    if (salvo.posicao < 0 || salvo.posicao >= telas.length) return;
-    respostas = { ...estadoInicial(), ...salvo.respostas };
+    if (!sessaoValida(salvo, telas)) return;
+    respostas = salvo.respostas;
     posicao = salvo.posicao;
   }
 
