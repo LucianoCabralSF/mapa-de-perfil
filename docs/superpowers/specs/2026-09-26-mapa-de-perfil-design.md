@@ -1,6 +1,6 @@
 # Mapa de Perfil — Especificação de Design
 
-Data: 2026-09-26
+Data: 2026-09-26 (revisão 2 no mesmo dia: seções 2.2, 2.3, 2.5, 3.1, 3.2, 3.3, 5.1, 5.4 e 5.6)
 Autor: Luciano Cabral Ferreira (DEL / Lótus Desenvolvimento Humano e Gerencial)
 
 ## 1. Propósito
@@ -70,12 +70,13 @@ que a dinâmica de sala funcione.
 
 ### 2.2 Bloco A2 — Comportamento adaptado
 
-Os **mesmos 10 blocos** do A1, com âncora diferente:
+**Seis dos dez blocos** do A1 — os de índice canônico `[1, 3, 5, 6, 7, 9]`
+(`BLOCOS_ADAPTADO`) —, com âncora diferente:
 
 **Âncora:** "Como você sente que precisa ser no seu trabalho (ou estudo) hoje,
 para dar conta do que esperam de você."
 
-Para reduzir a repetição mecânica, os 10 blocos são apresentados em ordem
+Para reduzir a repetição mecânica, os 6 blocos são apresentados em ordem
 invertida em relação ao A1, e as 4 palavras dentro de cada bloco em ordem
 também invertida. A ordem é fixa e definida no código, não sorteada — o mesmo
 conjunto de respostas sempre produz o mesmo resultado.
@@ -97,10 +98,17 @@ MVPI e Teoria da Autodeterminação:
 | PRO | Propósito | Causa, impacto na vida das pessoas |
 | PER | Pertencimento | Time, vínculo, fazer parte de algo |
 
-**Formato: concordância.** 12 afirmações, 2 por motivador, escala de 1 a 5
-(Discordo totalmente → Concordo totalmente). Aqui a escala funciona porque o
-resultado apresentado é o **ranking relativo** entre os seis, não a nota
-absoluta de cada um.
+**Formato: comparação pareada** (Thurstone). 15 telas, uma para cada par
+possível entre os seis motivadores. Cada tela mostra duas frases e a pessoa
+toca na que pesa mais para ela no trabalho. São 30 frases, 5 por motivador, e
+cada frase aparece uma única vez. A ordem dos pares segue o método do círculo
+(pares seguidos nunca repetem motivador), e os lados foram escolhidos para que
+cada motivador fique 2 ou 3 vezes à esquerda — sem isso, a posição na tela
+puxaria as escolhas.
+
+Substituiu, na revisão 2, as 12 afirmações com escala de concordância: em
+escala, quase todo mundo dá nota alta para Propósito e Pertencimento porque
+soam bem, e o ranking sai parecido entre as pessoas.
 
 ### 2.4 Bloco C — Momento atual
 
@@ -125,15 +133,15 @@ em todas as cinco a nota alta signifique **mais turbulência**.
 |---|---|
 | Identificação | 1 |
 | A1 — natural | 10 |
-| A2 — adaptado | 10 |
-| B — motivações | 12 |
+| A2 — adaptado | 6 |
+| B — motivações (pares) | 15 |
 | C — momento | 5 |
-| **Total de telas de resposta** | **37** |
+| **Total de telas de resposta** | **36** |
 
-Estimativa de 12 a 14 minutos.
+Estimativa de cerca de 10 minutos.
 
 **Chave de redução:** o Bloco A2 é controlado por uma constante única no código
-(`INCLUIR_ADAPTADO`). Desligando-a, o teste cai para 27 telas e ~8 minutos, o
+(`INCLUIR_ADAPTADO`). Desligando-a, o teste cai para 30 telas e ~8 minutos, o
 relatório omite a seção Natural × Adaptado e todo o resto continua funcionando.
 Serve para o caso de o tempo de aula ficar curto.
 
@@ -142,8 +150,10 @@ Serve para o caso de o tempo de aula ficar curto.
 ### 3.1 Comportamento (aplicado separadamente a A1 e A2)
 
 - "Mais parecido" soma **+1** ao fator escolhido; "menos parecido" soma **−1**.
-- Pontuação bruta por fator: intervalo de −10 a +10. A soma das quatro é sempre 0.
-- Intensidade exibida: `pct = (bruto + 10) / 20 * 100`, arredondada ao inteiro.
+- Pontuação bruta por fator: intervalo de −n a +n, onde n é o número de blocos
+  (10 no A1, 6 no A2). A soma das quatro é sempre 0.
+- Intensidade exibida: `pct = (bruto + n) / (2n) * 100`, arredondada ao inteiro;
+  com n = 0, todos os fatores ficam em 50.
   Lida como posição relativa dentro da própria pessoa; 50% é a linha de base.
 - **Perfil dominante** = fator de maior pontuação bruta **no A1 (natural)**. É
   o A1 que define quem a pessoa é; o A2 entra apenas como comparação.
@@ -156,6 +166,9 @@ Serve para o caso de o tempo de aula ficar curto.
 
 Mede o esforço que o ambiente atual está cobrando.
 
+- A comparação usa **os mesmos 6 blocos** nos dois lados: `pctNatural` aqui é o
+  A1 restrito a `BLOCOS_ADAPTADO` (`naturalComparavel`), não o A1 inteiro.
+  Comparar 6 respostas com 10 distorceria a medida.
 - Diferença por fator: `dif[f] = pctAdaptado[f] - pctNatural[f]`.
 - **Índice de Tensão** = média dos quatro valores absolutos:
   `tensao = (|difE| + |difC| + |difP| + |difA|) / 4`, em pontos percentuais.
@@ -179,10 +192,12 @@ relatório, e o texto o trata como informação, não como problema pessoal.
 
 ### 3.3 Motivações
 
-- Cada motivador soma suas 2 afirmações: bruto de 2 a 10.
-- Exibição: `pct = (bruto - 2) / 8 * 100`.
-- Ranking decrescente. Empate resolvido pela ordem fixa
-  `REA > AUT > SEG > REC > PRO > PER`.
+- Cada motivador aparece em 5 pares: bruto = número de vitórias, de 0 a 5.
+- Exibição: `pct = bruto / 5 * 100`.
+- Ranking decrescente. Empate resolvido primeiro pelas vitórias contra quem
+  terminou com o mesmo número de vitórias (confronto dentro do grupo empatado);
+  persistindo o empate — inclusive o circular, A vence B, B vence C, C vence A —
+  vale a ordem fixa `REA > AUT > SEG > REC > PRO > PER`.
 - Destaques: os **2 primeiros** ("o que mais te move") e o **último**
   ("o que menos te move").
 
@@ -280,7 +295,12 @@ de uso. Os gráficos são SVG gerado pelo próprio código.
 |---|---|
 | `index.html` | Marcação mínima e ponto de entrada |
 | `estilos.css` | Identidade visual, layout responsivo, folha de impressão |
-| `src/dados.js` | Os 10 blocos de palavras, as 12 afirmações, as 5 do momento |
+| `src/dados.js` | Os 10 blocos de palavras, as 30 frases dos pares, as 5 do momento |
+| `src/compartilhar.js` | Texto do resumo compartilhado e abertura do WhatsApp |
+| `src/ambiente.js` | Reconhecimento de navegador embutido em aplicativo |
+| `metodo.html` | Referencial teórico |
+| `facilitador.html` | Guia do facilitador (sem link no site, `noindex`) |
+| `imagens/`, `ferramentas/previa.html` | Imagem de prévia do link e sua fonte |
 | `src/textos.js` | Biblioteca de textos do relatório |
 | `src/motor.js` | Cálculo de pontuação, tensão, momento, desempate |
 | `src/graficos.js` | Geração dos SVG |
@@ -308,7 +328,7 @@ objeto de resultado. Isso permite conferir a matemática isoladamente.
 `Abertura` → `Identificação` → `Bloco A1 (10)` → `Virada de âncora` →
 `Bloco A2 (10)` → `Bloco B (12)` → `Bloco C (5)` → `Relatório`
 
-- Barra de progresso contínua ao longo das 37 telas.
+- Barra de progresso contínua ao longo das 36 telas.
 - Botão voltar em todas as telas de pergunta.
 - Identificação pede apenas o primeiro nome (obrigatório, só para o cabeçalho
   do relatório) e, opcionalmente, cargo ou área de interesse.
@@ -335,6 +355,10 @@ página. `sessionStorage` é apagado pelo próprio navegador ao fechar a aba, e
 nunca sai do aparelho da pessoa. Acesso protegido por `try/catch`: se o
 navegador bloquear armazenamento, o teste continua funcionando normalmente.
 
+A chave de armazenamento é `mapa-de-perfil-v2`. Ela mudou na revisão 2 porque o
+formato das respostas mudou; uma sessão salva na v1 simplesmente não é lida, e
+quem estiver com a aba aberta durante uma atualização recomeça do início.
+
 Nenhum dado é transmitido para servidor algum.
 
 ### 5.5 Publicação
@@ -346,9 +370,30 @@ resultante: `https://lucianocabralsf.github.io/mapa-de-perfil/`
 O push e a ativação do Pages serão feitos pelo próprio usuário. O repositório
 local fica preparado, com README explicando o passo a passo.
 
+### 5.6 Páginas e recursos complementares (revisão 2)
+
+- **`metodo.html`** — referencial teórico em sete seções (funcionamento,
+  comportamento, natural × adaptado, motivações, momento, limites,
+  referências). Link na abertura e no rodapé do relatório, onde o endereço
+  também aparece como texto para constar no PDF. Toda referência publicada foi
+  conferida em fonte externa.
+- **`facilitador.html`** — roteiro de aula de 70 minutos, os quatro perfis,
+  leitura do Índice de Tensão, dinâmica em grupos, perguntas para plenária e
+  combinados éticos. Não é linkado em nenhuma página e leva `noindex, nofollow`.
+- **Prévia do link** — metatags Open Graph com imagem 1200×630 em URL absoluta.
+- **Compartilhar** — resumo sem o nome da pessoa (perfil + 2 motivadores +
+  link), pelo compartilhamento nativo do celular ou, sem ele, pelo WhatsApp.
+  Cancelar a janela nativa não abre nada.
+- **Navegador de aplicativo** (WhatsApp, Instagram, Facebook, WebView do
+  Android) — aviso na abertura para abrir no navegador antes de começar; no
+  relatório, o primeiro toque em "Salvar em PDF" explica a limitação e o
+  segundo tenta imprimir mesmo assim.
+- **Linguagem neutra** — nenhum texto que descreve a pessoa usa forma
+  flexionada no masculino; a régua fica em `testes/apoio/linguagem.js`.
+
 ## 6. Desenho da experiência
 
-O instrumento tem 37 telas de resposta. Esse é o maior risco do projeto: um
+O instrumento tem 36 telas de resposta. Esse é o maior risco do projeto: um
 questionário longo num celular, em sala de aula, com gente cansada no fim do
 dia. Tudo nesta seção existe para reduzir o custo de cada resposta e a sensação
 de distância até o fim.
@@ -358,7 +403,7 @@ de distância até o fim.
 1. **Uma decisão por tela.** Nunca duas perguntas simultâneas.
 2. **Responder custa um toque.** Nada que exija confirmar o que já foi marcado.
 3. **Nunca rolar a tela para responder.** Se não couber, redesenhar a tela.
-4. **O progresso anima em vez de desanimar.** A pessoa nunca vê o número 37.
+4. **O progresso anima em vez de desanimar.** A pessoa nunca vê o número 36.
 5. **Zero burocracia.** Só o primeiro nome. Sem e-mail, telefone ou termos.
 6. **Zero espera.** Tudo roda local; não existe tela de carregamento.
 
@@ -388,7 +433,7 @@ Consequências desse desenho:
 A barra de progresso mostra **"Etapa 2 de 4"** e enche dentro da etapa atual,
 reiniciando a cada etapa. As quatro etapas são os quatro blocos.
 
-O total de 37 nunca é exibido. Quatro corridas curtas são psicologicamente mais
+O total de 36 nunca é exibido. Quatro corridas curtas são psicologicamente mais
 fáceis que uma longa, mesmo somando o mesmo tempo.
 
 Com `INCLUIR_ADAPTADO` desligada, passam a ser 3 etapas, e o contador se ajusta
@@ -413,7 +458,7 @@ A ordem é escolhida pela curva de fadiga, não pela lógica do instrumento:
    pega a pessoa com energia alta.
 2. **A2** em seguida — é o trecho mais pesado, por repetir o que já foi visto.
    Fica cedo de propósito, não no fim.
-3. **B** — 12 afirmações com resposta em um toque; ritmo rápido, sensação de
+3. **B** — 15 pares de frases com resposta em um toque; ritmo rápido, sensação de
    avanço veloz.
 4. **C** — apenas 5 perguntas. A reta final parece descida.
 
@@ -450,7 +495,7 @@ O relatório é longo. Para não ser um paredão de texto:
   dominante, ranking de motivadores, faixa de tensão e faixa de momento
   encontra texto correspondente, sem lacuna.
 - **Chave de redução**: com `INCLUIR_ADAPTADO` desligada, o teste deve fechar
-  em 27 telas e o relatório sair íntegro, sem a seção Natural × Adaptado e sem
+  em 30 telas e o relatório sair íntegro, sem a seção Natural × Adaptado e sem
   menção a tensão em nenhum outro lugar.
 - **Navegador**: abrir a página, responder do início ao fim, conferir o
   relatório e a prévia de impressão.
@@ -469,7 +514,7 @@ O relatório é longo. Para não ser um paredão de texto:
   posiciona a ferramenta como autoconhecimento e apoio à decisão, não como
   teste psicológico — que, no Brasil, é atividade privativa de psicólogo
   (Resolução CFP). O texto do rodapé é parte do produto, não enfeite.
-- **Fadiga de preenchimento.** 37 telas é longo para um celular em sala de
+- **Fadiga de preenchimento.** 36 telas é longo para um celular em sala de
   aula, e o Bloco A2 repete palavras já vistas. É o maior risco do projeto — a
   seção 6 inteira existe para tratá-lo, e a chave de redução é o plano B. Ainda
   assim, o desenho só se prova numa turma real: vale um teste com duas ou três

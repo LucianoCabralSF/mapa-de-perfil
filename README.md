@@ -1,6 +1,6 @@
 # Mapa de Perfil
 
-Um questionário de cerca de 13 minutos que a pessoa responde pelo celular e, ao
+Um questionário de cerca de 10 minutos que a pessoa responde pelo celular e, ao
 terminar, recebe na hora um relatório com seu perfil comportamental, suas
 motivações e uma leitura de quanto o momento de vida dela pode estar
 influenciando esse retrato. O relatório pode ser salvo em PDF.
@@ -27,9 +27,26 @@ Feito para a DEL / Lótus Desenvolvimento Humano e Gerencial.
 
 ---
 
+## Os três endereços
+
+| Endereço | Para quem |
+|---|---|
+| https://lucianocabralsf.github.io/mapa-de-perfil/ | A turma: é o teste |
+| https://lucianocabralsf.github.io/mapa-de-perfil/metodo.html | Qualquer pessoa: a base teórica e os limites do método |
+| https://lucianocabralsf.github.io/mapa-de-perfil/facilitador.html | **Só para quem conduz a aula — não divulgar.** O roteiro da aula não aparece em nenhum link do site nem no Google |
+
+Quando o link é mandado no WhatsApp, aparece uma prévia com a marca da DEL. Se
+a prévia vier antiga ou sem imagem, é o WhatsApp que guardou uma versão
+anterior; ela se atualiza sozinha depois de um tempo.
+
+Quem abrir o link **dentro** do WhatsApp ou do Instagram recebe um aviso para
+abrir no navegador antes de começar — é lá que o "Salvar em PDF" funciona.
+
+---
+
 ## Como encurtar o teste
 
-O teste tem 4 etapas e leva cerca de 13 minutos. A etapa mais demorada é a
+O teste tem 4 etapas e leva cerca de 10 minutos. A etapa mais demorada é a
 segunda, em que as mesmas palavras aparecem de novo para medir a diferença
 entre como a pessoa é e como ela precisa ser no trabalho.
 
@@ -37,7 +54,7 @@ Se o tempo da aula ficar curto, dá para desligar essa etapa. O teste cai para
 **3 etapas e cerca de 8 minutos**, e o relatório continua completo — só não terá
 a seção "Natural × Adaptado".
 
-Abra o arquivo `src/dados.js`. Na quarta linha está escrito:
+Abra o arquivo `src/dados.js`. Logo no começo está escrito:
 
 ```js
 export const INCLUIR_ADAPTADO = true;
@@ -68,9 +85,10 @@ Depois abra no navegador o endereço que aparecer (algo como
 npm test
 ```
 
-São 60 testes automáticos que verificam as contas do questionário: pontuação,
-desempate, índice de tensão, inversão das perguntas de momento e montagem do
-relatório. Todos precisam passar.
+São mais de 100 testes automáticos. Eles verificam as contas do questionário
+(pontuação, desempate, índice de tensão, ranking dos pares, inversão das
+perguntas de momento), a montagem do relatório, as duas páginas extras e se
+todo texto está em linguagem neutra. Todos precisam passar.
 
 ---
 
@@ -80,13 +98,18 @@ relatório. Todos precisam passar.
 |---|---|
 | `index.html` | A página em si |
 | `estilos.css` | Cores, layout do celular e o formato de impressão em PDF |
+| `metodo.html` | A página da base teórica |
+| `facilitador.html` | O guia de quem conduz a aula |
 | `src/dados.js` | As perguntas do questionário e a chave para encurtar o teste |
 | `src/textos.js` | Todos os textos do relatório |
 | `src/motor.js` | As contas: pontuação, perfil, tensão, motivações, momento |
 | `src/graficos.js` | Os gráficos de barra |
 | `src/relatorio.js` | Monta o relatório final |
 | `src/telas.js` | A navegação entre as telas |
+| `src/compartilhar.js` | O botão "Compartilhar meu perfil" |
+| `src/ambiente.js` | Reconhece quando o link foi aberto dentro de um aplicativo |
 | `src/app.js` | Liga tudo e inicia |
+| `imagens/` | Logotipo e imagem da prévia do link |
 | `docs/superpowers/` | A especificação e o plano de construção |
 
 ---
