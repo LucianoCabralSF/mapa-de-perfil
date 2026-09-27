@@ -332,7 +332,11 @@ export function criarNavegacao(raiz) {
   function telaForcada(tela) {
     const resposta = respostas[tela.campo][tela.indiceResposta];
     const passo2 = passo === 'menos';
-    const rotulo = passo2 ? `Passo 2 de 2 · ${tela.rotuloMenos}` : `Passo 1 de 2 · ${tela.rotuloMais}`;
+    // A palavra que decide o passo (mais / menos) vira destaque em caixa alta.
+    const destaque = (texto) => escaparHtml(texto).replace(/\b(mais|menos)\b/, (m) => `<strong>${m.toUpperCase()}</strong>`);
+    const rotulo = passo2
+      ? `<p class="passo-destaque passo-menos"><span class="passo-num">Passo 2 de 2</span><span>${destaque(tela.rotuloMenos)}</span></p>`
+      : `<p class="passo-destaque passo-mais"><span class="passo-num">Passo 1 de 2</span><span>${destaque(tela.rotuloMais)}</span></p>`;
     const opcoes = tela.opcoes.map((o) => {
       const marcada = passo2 && resposta.mais === o.codigo;
       return `<button type="button" class="${marcada ? 'opcao marcada bloqueada' : 'opcao'}" `
@@ -342,7 +346,7 @@ export function criarNavegacao(raiz) {
       + progresso(tela)
       + (tela.contexto ? `<p class="contexto-tela">${escaparHtml(tela.contexto)}</p>` : '')
       + `<p class="enunciado">${escaparHtml(tela.titulo)}</p>`
-      + `<p class="rotulo-passo">${escaparHtml(rotulo.toUpperCase())}</p>`
+      + rotulo
       + `<div class="opcoes">${opcoes}</div>`
       + botaoVoltar()
       + '</div>';

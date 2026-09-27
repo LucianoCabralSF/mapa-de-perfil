@@ -251,3 +251,23 @@ test('voltar logo depois de completar uma tela nao e desfeito pelo avanco agenda
   await esperar(400);
   assert.equal(posicaoAtual(), pos - 1);
 });
+
+test('a tela de escolha destaca MAIS no passo 1 e MENOS no passo 2', async () => {
+  const telas = montarSequencia();
+  const pos = telas.findIndex((t) => t.tipo === 'forcada');
+  const { criarNavegacao } = await import('../src/telas.js');
+  const guardado = new Map();
+  globalThis.sessionStorage = {
+    getItem: (k) => (guardado.has(k) ? guardado.get(k) : null),
+    setItem: (k, v) => { guardado.set(k, String(v)); },
+    removeItem: (k) => { guardado.delete(k); },
+  };
+  globalThis.window = { scrollTo() {} };
+  guardado.set(CHAVE, JSON.stringify(sessaoDeExemplo({ posicao: pos })));
+  let aoClicar = null;
+  const raiz = { innerHTML: '', addEventListener: (_, fn) => { aoClicar = fn; }, querySelector: () => null, querySelectorAll: () => [] };
+  criarNavegacao(raiz).iniciar();
+  assert.match(raiz.innerHTML, /class="passo-destaque passo-mais"[^>]*>[\s\S]*<strong>MAIS<\/strong>/);
+  aoClicar({ target: { closest: () => ({ dataset: { acao: 'forcada', codigo: 'E' } }) } });
+  assert.match(raiz.innerHTML, /class="passo-destaque passo-menos"[^>]*>[\s\S]*<strong>MENOS<\/strong>/);
+});
