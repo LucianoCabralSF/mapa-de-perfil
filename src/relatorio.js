@@ -141,6 +141,8 @@ export function montarRelatorio(resultado) {
       + botaoCompartilhar()
       + creditoDel()
       + `<p class="aviso-legal">${escaparHtml(RODAPE_LEGAL)}</p>`
+      + '<p class="aviso-legal">Base teórica do método: '
+      + '<a href="metodo.html">lucianocabralsf.github.io/mapa-de-perfil/metodo.html</a></p>'
       + '</footer>',
   );
 

@@ -87,3 +87,10 @@ test('o botao de compartilhar existe e sai do pdf', () => {
   const html = montarRelatorio(resultadoDeExemplo());
   assert.match(html, /class="[^"]*sem-impressao[^"]*"[^>]*data-acao="compartilhar"/);
 });
+
+test('o rodape aponta a base teorica, tambem como texto para o pdf', () => {
+  const html = montarRelatorio(resultadoDeExemplo());
+  const rodape = html.slice(html.indexOf('rodape-relatorio'));
+  assert.ok(rodape.includes('href="metodo.html"'));
+  assert.ok(rodape.includes('lucianocabralsf.github.io/mapa-de-perfil/metodo.html'));
+});

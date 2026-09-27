@@ -32,3 +32,39 @@ test('a imagem da previa existe e e leve', () => {
   assert.ok(size > 5 * 1024, 'imagem vazia ou quebrada');
   assert.ok(size < 300 * 1024, `imagem pesada demais: ${Math.round(size / 1024)} KB`);
 });
+
+import { textoFlexionado } from './apoio/linguagem.js';
+
+function textoVisivel(html) {
+  return html.replace(/<style[\s\S]*?<\/style>/g, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ');
+}
+
+test('a pagina do metodo tem as sete secoes e volta para o teste', () => {
+  const html = ler('metodo.html');
+  for (let i = 1; i <= 7; i += 1) assert.ok(html.includes(`id="s${i}"`), `falta a secao ${i}`);
+  assert.ok(html.includes('href="./"'), 'falta o caminho de volta');
+  assert.ok(html.includes('estilos.css'));
+});
+
+test('a pagina do metodo declara os limites do instrumento', () => {
+  const texto = textoVisivel(ler('metodo.html'));
+  assert.match(texto, /não passou por (um )?estudo de validação/i);
+  assert.match(texto, /não é (um )?teste psicológico/i);
+});
+
+test('a pagina do metodo cita os autores do referencial', () => {
+  const texto = textoVisivel(ler('metodo.html'));
+  for (const autor of ['MARSTON', 'THURSTONE', 'HOCHSCHILD', 'KRISTOF', 'SCHEIN', 'DECI', 'HOGAN', 'SPIELBERGER', 'HOLMES', 'ROBERTS']) {
+    assert.ok(texto.includes(autor), `falta a referencia de ${autor}`);
+  }
+});
+
+test('a pagina do metodo usa linguagem neutra', () => {
+  assert.deepEqual(textoFlexionado(textoVisivel(ler('metodo.html'))), []);
+});
+
+test('a pagina do metodo tem previa propria', () => {
+  const m = metas(ler('metodo.html'));
+  assert.equal(m['og:url'], `${BASE}metodo.html`);
+  assert.equal(m['og:image'], `${BASE}imagens/previa.png`);
+});

@@ -44,3 +44,7 @@ test('a abertura so avisa quando esta dentro de aplicativo', () => {
   assert.ok(aviso.includes('pelo WhatsApp'));
   assert.ok(htmlAbertura({ interno: 'aplicativo' }).includes('dentro de um aplicativo'));
 });
+
+test('a abertura leva para a base teorica', () => {
+  assert.ok(htmlAbertura({ interno: null }).includes('href="metodo.html"'));
+});

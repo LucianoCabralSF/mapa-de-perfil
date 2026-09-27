@@ -127,6 +127,7 @@ export function htmlAbertura({ interno }) {
     + '<p class="aviso-abertura">Nada do que você responder é gravado em servidor. '
     + 'O resultado aparece aqui no seu aparelho e some quando você fechar esta aba.</p>'
     + '<button type="button" class="botao-principal" data-acao="comecar">Começar</button>'
+    + '<a class="link-metodo" href="metodo.html">Conheça a base teórica do método →</a>'
     + '</div>';
 }
 

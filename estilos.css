@@ -422,6 +422,23 @@ p.destaque {
 .grafico .barra.destaque { fill: var(--gold); }
 .grafico .barra.fraca { fill: var(--muted); }
 
+/* ---------- Paginas de texto (metodo, facilitador) ---------- */
+
+.pagina-texto { max-width: 720px; margin: 0 auto; padding: 28px 20px 56px; }
+.pagina-texto section { border-top: 1px solid var(--gold-soft); padding: 22px 0 6px; }
+.pagina-texto h2 { color: var(--navy); font-size: 22px; line-height: 1.25; margin: 6px 0 12px; }
+.pagina-texto p, .pagina-texto li { line-height: 1.55; }
+.pagina-texto .limites { background: var(--sand); border: 1.5px solid var(--gold); border-radius: 12px; padding: 18px; }
+.voltar-link { display: inline-block; margin: 8px 0 12px; color: var(--navy); font-weight: 600; text-decoration: none; }
+.tabela-rolagem { overflow-x: auto; }
+.tabela-rolagem table { border-collapse: collapse; width: 100%; font-size: 14px; }
+.tabela-rolagem th, .tabela-rolagem td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--gold-soft); vertical-align: top; }
+.tabela-rolagem th { color: var(--bronze); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; }
+.referencias { padding-left: 20px; font-size: 14px; color: var(--ink); }
+.referencias li { margin-bottom: 8px; }
+.link-metodo { display: block; text-align: center; margin: 14px 0 0; color: var(--navy); font-weight: 600; }
+.rodape-pagina { border-top: 1px solid var(--gold-soft); margin-top: 24px; padding-top: 12px; font-size: 12px; letter-spacing: 1.5px; color: var(--bronze); }
+
 /* ---------- Acessibilidade ---------- */
 
 @media (prefers-reduced-motion: reduce) {
@@ -437,6 +454,7 @@ p.destaque {
 /* ---------- Impressao ---------- */
 
 @media print {
+  .voltar-link { display: none; }
   .sem-impressao { display: none !important; }
 
   body {
